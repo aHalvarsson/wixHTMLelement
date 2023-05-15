@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>Dummy Tests</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* Styling for the interface grid/table */
+      .table {
+        display: grid;
+        grid-template-columns: repeat(
+          calc(var(--num-cols) + 1),
+          minmax(min-content, auto)
+        );
+        grid-auto-rows: minmax(35px, auto);
+        grid-gap: 0;
+        border: 1px solid black;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .visible {
+        display: grid;
+      }
+
+      .alwaysVisibleRows {
+        display: grid !important;
+      }
+
+      .cell {
+        padding: 3px;
+        border: 1px solid black;
+      }
+
+      .rowsCols {
+        font-weight: bold;
+        background-color: #acacac;
+        border: 1px solid black;
+      }
+
+      .found-header {
+        background-color: yellow;
+      }
+
+      .toggle-container {
+        margin: 10px 0;
+      }
+
+      .toggle-switch {
+        display: block;
+      }
+
+      /* Styling for the SIE headers section */
+      .sie-headers {
+        position: relative;
+        margin-top: 10px;
+        width: auto;
+      }
+
+      .sie-header {
+        display: inline-block;
+        padding: 5px;
+        border: 1px solid black;
+        cursor: move;
+      }
+
+      .linked {
+        border: 2px solid blue;
+      }
+
+      /* Styling for the Save changes buttons */
+      button {
+        margin-top: 10px;
+      }
+
+      #table-container {
+        width: 100%;
+        height: auto;
+      }
+      .tabs {
+        width: 100%;
+        height: 3rem;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: flex-start;
+        align-items: flex-end;
+      }
+      .tab {
+        display: flex;
+        font-size: 0.8rem;
+        font-weight: 600;
+        justify-content: center;
+        align-items: center;
+        padding: 0 0.5rem;
+        cursor: pointer;
+        width: -moz-fit-content;
+        width: fit-content;
+        height: 3rem;
+        background-color: #e9e9e9;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        border-bottom: 4px solid #ececec;
+      }
+      .tab:hover {
+        border-bottom: 4px solid #ddd;
+      }
+      .tab:active {
+        border-bottom: 4px solid #eee;
+      }
+      .tab .active {
+        background-color: #fff;
+        border-bottom: 4px solid #333;
+      }
+      #main-element-container {
+        width: 90%;
+        background-color: #fff;
+        margin: 0 auto;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+      }
+      .guess {
+        color: lightgray;
+      }
+      .found-title {
+        background-color: yellow;
+      }
+    </style>
+    <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <div id="main-element-container"></div>
+    <script>
+      window.onmessage = (event) => {
+        // recive data from uotside the HTML element
+
+        if (event.data) {
+          let mainContainer = document.getElementById("main-element-container");
+
+          const fileArray = event.data[0]; // Array of files
+          const foundHeaders = event.data[1]; // Array of headers for each file
+          const excelData = event.data[2]; // Array of Excel data for each file, everey nested array is a row
+          const sieHeaders = [
+            // Array of SIE headers
+            "Debet",
+            "Kredit",
+            "Belopp",
+            "Konto",
+            "Konstnadsställe",
+            "Projekt",
+            "Radtext",
+            "Radbeskrivning",
+            "Kostnadsbärare",
+            "Debetbelopp",
+            "Kreditbelopp",
+            "Verifikationstext",
+            "Verifikatserie",
+          ];
+          createTabs(fileArray, mainContainer);
+          createGrids(
+            fileArray,
+            foundHeaders,
+            sieHeaders,
+            excelData,
+            mainContainer
+          );
+          loadData();
+        }
+      };
+
+      // Create a tab for each Excel file
+      function createTabs(excelFiles, mainContainer) {
+        const tabs = document.createElement("ul");
+        tabs.classList.add("tabs");
+
+        excelFiles.forEach((file, index) => {
+          const tab = document.createElement("li");
+          tab.classList.add("tab");
+          tab.textContent = file.name;
+          tab.dataset.index = index;
+          tab.addEventListener("click", handleTabClick);
+          tabs.appendChild(tab);
+        });
+
+        mainContainer.appendChild(tabs);
+      }
+
+      // Handle tab click
+      function handleTabClick(event) {
+        const index = event.target.dataset.index;
+        const grids = document.querySelectorAll(".grid");
+        grids.forEach((grid, i) => {
+          if (i === parseInt(index)) {
+            grid.classList.add("active");
+          } else {
+            grid.classList.remove("active");
+          }
+        });
+      }
+
+      // Create a grid for each Excel file
+      function createGrids(
+        excelFiles,
+        foundTitles,
+        sieHeaders,
+        excelData,
+        mainContainer
+      ) {
+        excelFiles.forEach((file, index) => {
+          foundTitles = foundTitles[index];
+          excelData = excelData[index];
+          const grid = document.createElement("div");
+          grid.classList.add("grid");
+          if (index === 0) {
+            grid.classList.add("active");
+          }
+
+          // Create SIE header boxes
+          const sieHeaderBoxes = document.createElement("div");
+          sieHeaderBoxes.classList.add("sie-header-boxes");
+          sieHeaders.forEach((header) => {
+            const box = document.createElement("div");
+            box.classList.add("sie-header-box");
+            box.textContent = header;
+            box.draggable = true;
+            box.addEventListener("dragstart", handleDragStart);
+
+            // Display SIE header guesses in light gray if no data titles are found
+            if (foundTitles.length === 0) {
+              box.classList.add("guess");
+            }
+
+            sieHeaderBoxes.appendChild(box);
+          });
+          grid.appendChild(sieHeaderBoxes);
+
+          // Create toggle button
+          /*const toggleButton = document.createElement('button');
+    toggleButton.textContent = 'Toggle Full Data';
+    toggleButton.addEventListener('click', handleToggleClick);
+    grid.appendChild(toggleButton);
+*/
+
+          // Create data grid
+          const dataGrid = document.createElement("div");
+          dataGrid.classList.add("data-grid");
+          grid.appendChild(dataGrid);
+
+          // Add column letters and row numbers
+          let range = {
+            start: "A1",
+            end:
+              String.fromCharCode(excelData[0].length) +
+              String(excelData.length),
+          };
+          addColumnLettersAndRowNumbers(grid, range);
+
+          // Add data from excelData array
+          addData(dataGrid, excelData);
+
+          // Add row toggle switch
+          createToggleSwitcher(grid);
+
+          // Add highlight to the found titles
+          highlightFoundTitles(grid, foundTitles);
+
+          // Make all data cells editable
+          makeCellsEditable(grid);
+
+          // Enable drag and drop functionality
+          enableDragAndDrop(grid);
+
+          // Add disconnect buttons to SIE header boxes
+          addDisconnectButtons(grid);
+
+          // Add save button to grid
+          addSaveButton(grid, file);
+
+          // Start with the right rows visible
+          handleToggleChange(event, foundHeaders, excelData);
+
+          mainContainer.appendChild(grid);
+        });
+      }
+
+      // Creates a row toggle switch to every tab
+      function createToggleSwitcher(grid) {
+        const toggleSwitch = document.createElement("input");
+        toggleSwitch.setAttribute("type", "checkbox");
+        toggleSwitch.classList.add("toggle-switch");
+        toggleSwitch.checked = "true";
+        toggleSwitch.addEventListener("change", (event) =>
+          handleToggleChange(event, foundTitles, excelData)
+        );
+        const toggleLabel = document.createElement("label");
+        toggleLabel.appendChild(toggleSwitch);
+
+        const toggleContainer = document.createElement("div");
+        toggleContainer.classList.add("toggle-container");
+        toggleContainer.appendChild(toggleLabel);
+        grid.insertAdjacentElement("afterbegin", toggleContainer);
+      }
+
+      // Handle toggle switch click
+      function handleToggleChange(event, foundHeaders, excelData) {
+        const headerRowIndex = foundHeaders[0].row;
+
+        const numCols = excelData[0].length + 1;
+        const rows = Array.from(
+          table.querySelectorAll(
+            `.cell:nth-child(${numCols}n+1):not(.row-header)`
+          )
+        );
+
+        const startIndex = headerRowIndex - 1;
+        const endIndex = headerRowIndex + 9;
+
+        rows.forEach((row, index) => {
+          if (index !== 0) {
+            const rowCells = Array.from(
+              row.parentNode.querySelectorAll(
+                `.cell:nth-child(n+${index * numCols + 1}):nth-child(-n+${
+                  (index + 1) * numCols
+                })`
+              )
+            );
+
+            if (toggleSwitch.checked) {
+              if (index < startIndex || index > endIndex) {
+                rowCells.forEach((cell) => {
+                  if (cell.classList.contains("visible"))
+                    cell.classList.remove("visible");
+                  cell.classList.add("hidden");
+                });
+              } else {
+                rowCells.forEach((cell) => {
+                  if (!cell.classList.contains("visible"))
+                    cell.classList.add("visible");
+                });
+              }
+            } else {
+              rowCells.forEach((cell) => {
+                setTimeout(() => {
+                  if (!cell.classList.contains("visible"))
+                    cell.classList.add("visible");
+                  if (cell.classList.contains("hidden"))
+                    cell.classList.remove("hidden");
+                }, index * 2);
+              });
+            }
+          }
+        });
+      }
+
+      // Handle drag start
+      function handleDragStart(event) {
+        event.dataTransfer.setData("text/plain", event.target.textContent);
+      }
+
+      // Add column letters and row numbers to data grid
+      function addColumnLettersAndRowNumbers(grid, range) {
+        const dataGrid = grid.querySelector(".data-grid");
+
+        // Get range dimensions
+        const [startColumn, startRow] = range.start
+          .split(/(\d+)/)
+          .filter(Boolean);
+        const [endColumn, endRow] = range.end.split(/(\d+)/).filter(Boolean);
+        const columnCount =
+          endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
+        const rowCount = endRow - startRow + 1;
+
+        // Create top-left corner cell
+        const cornerCell = document.createElement("div");
+        cornerCell.classList.add("cell", "corner-cell");
+        dataGrid.appendChild(cornerCell);
+
+        // Create column letter cells
+        for (let i = 0; i < columnCount; i++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell", "column-letter-cell");
+          cell.textContent = String.fromCharCode(startColumn.charCodeAt(0) + i);
+          dataGrid.appendChild(cell);
+        }
+
+        // Create row number cells and data cells
+        for (let i = 0; i < rowCount; i++) {
+          // Create row number cell
+          const rowNumberCell = document.createElement("div");
+          rowNumberCell.classList.add("cell", "row-number-cell");
+          rowNumberCell.textContent = startRow + i;
+          dataGrid.appendChild(rowNumberCell);
+
+          // Create data cells
+          for (let j = 0; j < columnCount; j++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell", "data-cell");
+            dataGrid.appendChild(cell);
+          }
+        }
+      }
+
+      // Add data from excelData array to data grid
+      function addData(dataGrid, excelData) {
+        const dataCells = dataGrid.querySelectorAll(".data-cell");
+
+        excelData.forEach((row, rowIndex) => {
+          row.forEach((cellValue, cellIndex) => {
+            console.log(
+              "Column: " +
+                cellIndex +
+                " Row: " +
+                rowIndex +
+                " Cellvalue: " +
+                cellValue
+            );
+            if(cellValue === null || cellValue === undefined) cellValue = "";
+            console.log(dataCells);
+            console.log(rowIndex * row.length + cellIndex);
+            console.log(dataCells[rowIndex * row.length + cellIndex]);
+            const cell = dataCells[rowIndex * row.length + cellIndex];
+            cell.textContent = formatCellValue(cellValue);
+          });
+        });
+      }
+
+      // Highlight cells with found titles
+      function highlightFoundTitles(grid, foundTitles) {
+        const dataCells = grid.querySelectorAll(".data-cell");
+
+        foundTitles.forEach((title) => {
+          //const [column, row] = title.position.split(/(\d+)/).filter(Boolean);
+          const column = title.col;
+          const row = title.row;
+          const rowIndex = row - 1;
+          const cellIndex = column.charCodeAt(0) - "A".charCodeAt(0);
+          const cell = dataCells[rowIndex * row.length + cellIndex];
+          cell.classList.add("found-title");
+        });
+      }
+
+      // Make all data cells editable
+      function makeCellsEditable(grid) {
+        const dataCells = grid.querySelectorAll(".data-cell");
+
+        dataCells.forEach((cell) => {
+          cell.addEventListener("click", handleCellClick);
+        });
+      }
+
+      // Handle cell click
+      function handleCellClick(event) {
+        const cell = event.target;
+        const value = cell.textContent;
+        cell.textContent = "";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = value;
+        input.addEventListener("blur", handleInputBlur);
+        input.addEventListener("keydown", handleInputKeydown);
+
+        cell.appendChild(input);
+        input.focus();
+      }
+
+      // Create error message element
+      const errorMessage = document.createElement("div");
+      errorMessage.classList.add("error-message");
+      document.body.appendChild(errorMessage);
+
+      // Handle input blur
+      function handleInputBlur(event) {
+        const input = event.target;
+        const cell = input.parentElement;
+        const value = input.value;
+
+        // Validate value
+        if (!isValid(value)) {
+          // Display error message
+          errorMessage.textContent = "Invalid value";
+          errorMessage.style.display = "block";
+          setTimeout(() => {
+            errorMessage.style.display = "none";
+          }, 3000);
+          return;
+        }
+
+        cell.textContent = value;
+
+        // Save data to localStorage
+        saveData();
+      }
+
+      // Check if value is valid
+      function isValid(value) {
+        // Add validation logic here
+        return true;
+      }
+
+      // Handle input keydown
+      function handleInputKeydown(event) {
+        if (event.key === "Enter") {
+          event.target.blur();
+        }
+      }
+
+      // Enable drag and drop functionality
+      function enableDragAndDrop(grid) {
+        const dataCells = grid.querySelectorAll(".data-cell");
+        const sieHeaderBoxes = grid.querySelectorAll(".sie-header-box");
+
+        // Allow data cells to be drop targets
+        dataCells.forEach((cell) => {
+          cell.addEventListener("dragover", handleDragOver);
+          cell.addEventListener("drop", handleDrop);
+        });
+
+        // Handle drag end on SIE header boxes
+        sieHeaderBoxes.forEach((box) => {
+          box.addEventListener("dragend", handleDragEnd);
+        });
+      }
+
+      // Handle drag over
+      function handleDragOver(event) {
+        event.preventDefault();
+      }
+
+      // Variable to keep track of current position in color wheel
+      let colorWheelPosition = 0;
+
+      // Handle drop
+      function handleDrop(event) {
+        event.preventDefault();
+        const data = event.dataTransfer.getData("text/plain");
+        const sieHeaderBox = document.querySelector(
+          `.sie-header-box:contains("${data}")`
+        );
+        const cell = event.target;
+
+        // Disconnect previous link
+        const previousLink = document.querySelector(
+          `[data-sie-header="${data}"]`
+        );
+        if (previousLink) {
+          previousLink.removeAttribute("data-sie-header");
+          previousLink.removeAttribute("data-connection-color");
+          previousLink.classList.remove("linked-cell");
+
+          // Remove data-connection-color attribute and styles from SIE header box
+          sieHeaderBox.removeAttribute("data-connection-color");
+          sieHeaderBox.style.borderColor = "";
+        }
+
+        // Connect new link
+        cell.setAttribute("data-sie-header", data);
+        cell.classList.add("linked-cell");
+
+        // Generate the next color in the color wheel
+        const color = getColorFromColorWheel(colorWheelPosition);
+        cell.setAttribute("data-connection-color", color);
+
+        // Update SIE header box
+        sieHeaderBox.classList.add("linked-box");
+        sieHeaderBox.setAttribute("data-connection-color", color);
+
+        // Set styles for linked cell and SIE header box
+        cell.style.borderColor = color;
+        sieHeaderBox.style.borderColor = color;
+
+        // Increment color wheel position
+        colorWheelPosition++;
+      }
+
+      // Generate a color from the color wheel
+      function getColorFromColorWheel(position) {
+        // Array of colors in the color wheel
+        const colors = [
+          "red",
+          "orange",
+          "yellow",
+          "green",
+          "blue",
+          "indigo",
+          "violet",
+        ];
+
+        // Get the color at the specified position in the color wheel
+        const color = colors[position % colors.length];
+
+        return color;
+      }
+      // Handle drag end
+      function handleDragEnd(event) {
+        const box = event.target;
+        const data = box.textContent;
+        const linkedCell = document.querySelector(
+          `[data-sie-header="${data}"]`
+        );
+
+        // Check if box is linked to a cell
+        if (!linkedCell) {
+          box.classList.remove("linked-box");
+        }
+      }
+
+      // Add disconnect buttons to SIE header boxes
+      function addDisconnectButtons(grid) {
+        const sieHeaderBoxes = grid.querySelectorAll(".sie-header-box");
+
+        sieHeaderBoxes.forEach((box) => {
+          const button = document.createElement("button");
+          button.textContent = "X";
+          button.addEventListener("click", handleDisconnectClick);
+          box.appendChild(button);
+        });
+      }
+
+      // Handle disconnect click
+      function handleDisconnectClick(event) {
+        const box = event.target.parentElement;
+        const data = box.textContent;
+        const linkedCell = document.querySelector(
+          `[data-sie-header="${data}"]`
+        );
+
+        // Disconnect link
+        if (linkedCell) {
+          linkedCell.removeAttribute("data-sie-header");
+          linkedCell.classList.remove("linked-cell");
+        }
+
+        // Update SIE header box
+        box.classList.remove("linked-box");
+      }
+
+      // Format cell value
+      function formatCellValue(value) {
+        // Handle date values
+        if (isDate(value)) {
+          return formatDate(value);
+        }
+
+        // Handle number values
+        if (isNumber(value)) {
+          return formatNumber(value);
+        }
+
+        // Handle other values
+        return value;
+      }
+
+      // Check if value is a date
+      function isDate(value) {
+        return Object.prototype.toString.call(value) === "[object Date]";
+      }
+
+      // Format date value
+      function formatDate(value) {
+        const options = { year: "numeric", month: "short", day: "numeric" };
+        return value.toLocaleDateString("en-US", options);
+      }
+
+      // Check if value is a number
+      function isNumber(value) {
+        return typeof value === "number";
+      }
+
+      // Format number value
+      function formatNumber(value) {
+        return value.toLocaleString("en-US");
+      }
+
+      // Add save button to grid
+      function addSaveButton(grid, file) {
+        const saveButton = document.createElement("button");
+        saveButton.textContent = "Save Changes";
+        saveButton.addEventListener("click", () => handleSaveClick(grid, file));
+        grid.appendChild(saveButton);
+      }
+
+      // Handle save click
+      function handleSaveClick(grid, file) {
+        const dataCells = grid.querySelectorAll(".data-cell");
+        const data = [];
+
+        // Collect data from data cells
+        dataCells.forEach((cell) => {
+          const value = cell.textContent;
+
+          // ...
+        });
+      }
+
+      // Create output array
+      function createOutputArray(excelFiles) {
+        const output = [];
+        const grids = document.querySelectorAll(".grid");
+
+        grids.forEach((grid, index) => {
+          const file = excelFiles[index];
+          const dataCells = grid.querySelectorAll(".data-cell");
+          const data = [];
+
+          // Collect data from data cells
+          dataCells.forEach((cell) => {
+            const value = cell.textContent;
+            // ...
+          });
+
+          // Update Excel file with new data
+          // ...
+
+          // Collect SIE header connections
+          const sieHeaderBoxes = grid.querySelectorAll(".sie-header-box");
+          const connections = [];
+          sieHeaderBoxes.forEach((box) => {
+            const header = box.textContent;
+            const linkedCell = document.querySelector(
+              `[data-sie-header="${header}"]`
+            );
+            if (linkedCell) {
+              const position = linkedCell.dataset.position;
+              connections.push({ header, position });
+            }
+          });
+
+          output.push({ file, connections });
+        });
+
+        return output;
+      }
+
+      // Update Excel file with new data
+      function updateExcelFile(file, data) {
+        const workbook = XLSX.read(file, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        // Update cell values
+        data.forEach((row, rowIndex) => {
+          row.forEach((cellValue, cellIndex) => {
+            const cellAddress = XLSX.utils.encode_cell({
+              c: cellIndex,
+              r: rowIndex,
+            });
+            const cell = worksheet[cellAddress];
+            if (cell) {
+              cell.v = cellValue;
+            } else {
+              worksheet[cellAddress] = { t: "s", v: cellValue };
+            }
+          });
+        });
+
+        // Write changes to file
+        XLSX.writeFile(workbook, file.name);
+      }
+
+      // Save data to localStorage
+      function saveData() {
+        const grids = document.querySelectorAll(".grid");
+        const data = [];
+
+        grids.forEach((grid) => {
+          const dataCells = grid.querySelectorAll(".data-cell");
+          const gridData = [];
+
+          // Collect data from data cells
+          dataCells.forEach((cell) => {
+            gridData.push(cell.textContent);
+          });
+
+          // Collect SIE header connections
+          const sieHeaderBoxes = grid.querySelectorAll(".sie-header-box");
+          const connections = [];
+          sieHeaderBoxes.forEach((box) => {
+            const header = box.textContent;
+            const linkedCell = document.querySelector(
+              `[data-sie-header="${header}"]`
+            );
+            if (linkedCell) {
+              const position = linkedCell.dataset.position;
+              connections.push({ header, position });
+            }
+          });
+
+          // Collect toggle button state
+          const toggleButton = grid.querySelector("button");
+          const toggleState = toggleButton.classList.contains("toggled");
+
+          // Collect checkbox state
+          const checkbox = grid.querySelector('input[type="checkbox"]');
+          const checkboxState = checkbox.checked;
+
+          data.push({ gridData, connections, toggleState, checkboxState });
+        });
+
+        localStorage.setItem("data", JSON.stringify(data));
+      }
+
+      // Load data from localStorage
+      function loadData() {
+        const data = JSON.parse(localStorage.getItem("data"));
+
+        if (data) {
+          const grids = document.querySelectorAll(".grid");
+
+          grids.forEach((grid, index) => {
+            const { gridData, connections, toggleState, checkboxState } =
+              data[index];
+            const dataCells = grid.querySelectorAll(".data-cell");
+            const sieHeaderBoxes = grid.querySelectorAll(".sie-header-box");
+            const toggleButton = grid.querySelector("button");
+            const checkbox = grid.querySelector('input[type="checkbox"]');
+
+            // Load data into data cells
+            gridData.forEach((value, i) => {
+              const cell = dataCells[i];
+              cell.textContent = value;
+            });
+
+            // Load SIE header connections
+            connections.forEach((connection) => {
+              const { header, position } = connection;
+              const sieHeaderBox = document.querySelector(
+                `.sie-header-box:contains("${header}")`
+              );
+              const linkedCell = document.querySelector(
+                `[data-position="${position}"]`
+              );
+
+              // Connect link
+              linkedCell.setAttribute("data-sie-header", header);
+              linkedCell.classList.add("linked-cell");
+
+              // Update SIE header box
+              sieHeaderBox.classList.add("linked-box");
+            });
+
+            // Load toggle button state
+            if (toggleState) {
+              toggleButton.classList.add("toggled");
+            } else {
+              toggleButton.classList.remove("toggled");
+            }
+
+            // Load checkbox state
+            checkbox.checked = checkboxState;
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
