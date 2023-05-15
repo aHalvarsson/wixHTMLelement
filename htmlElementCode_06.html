@@ -369,14 +369,14 @@
         const columnCount =
           endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
 */
-          const startColumn = XLSX.utils.encode_Column(0);
-          const startRow = XLSX.utils.encode_Row(0);
-          const endColumn = XLSX.utils.encode_Column(excelData[0].length);
-          const endRow = XLSX.utils.encode_Row(excelData.length);
+          const startColumn = XLSX.utils.encode_col(0);
+          const startRow = XLSX.utils.encode_row(0);
+          const endColumn = XLSX.utils.encode_col(excelData[0].length);
+          const endRow = XLSX.utils.encode_row(excelData.length);
           const columnCount =
           endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
         const rowCount = endRow - startRow + 1;
-        
+
 
         // Create top-left corner cell
         const cornerCell = document.createElement("div");
