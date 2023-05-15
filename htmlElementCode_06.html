@@ -277,7 +277,7 @@
           await addSaveButton(grid, file);
 
           // Start with the right rows visible
-          await handleToggleChange(event, foundTitles, excelData);
+          handleToggleChange(event, foundTitles, excelData);
 
           mainContainer.appendChild(grid);
         });
@@ -305,8 +305,9 @@
       function handleToggleChange(event, foundHeaders, excelData) {
         const headerRowIndex = foundHeaders[0].row;
         const toggleSwitch = event.target;
-        const grid = toggleSwitch.closest('.grid');
-        const dataGrid = grid.querySelector('.data-grid');
+        debug(toggleSwitch);
+        const grid = toggleSwitch.closest(".grid");
+        const dataGrid = grid.querySelector(".data-grid");
         const numCols = excelData[0].length + 1;
         const rows = Array.from(
           dataGrid.querySelectorAll(
