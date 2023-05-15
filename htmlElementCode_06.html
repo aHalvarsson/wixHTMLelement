@@ -262,7 +262,7 @@
           await createToggleSwitcher(grid, dataGrid);
 
           // Add highlight to the found titles
-          await highlightFoundTitles(grid, foundTitles, excelData);
+          await highlightFoundTitles(dataGrid, foundTitles, excelData);
 
           // Make all data cells editable
           await makeCellsEditable(grid);
@@ -425,7 +425,7 @@
       }
 
       // Highlight cells with found titles
-      function highlightFoundTitles(grid, foundTitles, excelData) {
+      function highlightFoundTitles(dataGrid, foundTitles, excelData) {
         const dataCells = dataGrid.querySelectorAll(".data-cell");
 
         foundTitles.forEach((title) => {
