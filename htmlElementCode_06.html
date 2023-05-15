@@ -289,8 +289,9 @@
         toggleSwitch.setAttribute("type", "checkbox");
         toggleSwitch.classList.add("toggle-switch");
         toggleSwitch.checked = "true";
-        toggleSwitch.addEventListener("change", (event) =>
-          handleToggleChange(event, foundTitles, excelData)
+        toggleSwitch.addEventListener("change", (event) => {
+          const thisToggle = event.target;
+          handleToggleChange(thisToggle, foundTitles, excelData)}
         );
         const toggleLabel = document.createElement("label");
         toggleLabel.appendChild(toggleSwitch);
