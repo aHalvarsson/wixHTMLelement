@@ -259,7 +259,7 @@
           await addData(dataGrid, excelData);
 
           // Add row toggle switch
-          await createToggleSwitcher(grid);
+          await createToggleSwitcher(grid, dataGrid);
 
           // Add highlight to the found titles
           await highlightFoundTitles(grid, foundTitles, excelData);
@@ -284,13 +284,13 @@
       }
 
       // Creates a row toggle switch to every tab
-      function createToggleSwitcher(grid) {
+      function createToggleSwitcher(grid, dataGrid) {
         const toggleSwitch = document.createElement("input");
         toggleSwitch.setAttribute("type", "checkbox");
         toggleSwitch.classList.add("toggle-switch");
         toggleSwitch.checked = "true";
         toggleSwitch.addEventListener("change", (event) =>
-          handleToggleChange(event, foundTitles, excelData)
+          handleToggleChange(event, foundTitles, excelData, dataGrid)
         );
         const toggleLabel = document.createElement("label");
         toggleLabel.appendChild(toggleSwitch);
@@ -302,10 +302,11 @@
       }
 
       // Handle toggle switch click
-      function handleToggleChange(event, foundHeaders, excelData) {
+      function handleToggleChange(event, foundHeaders, excelData, dataGrid) {
         const headerRowIndex = foundHeaders[0].row;
 
         const numCols = excelData[0].length + 1;
+        const dataCells = dataGrid.querySelectorAll(".data-cell");
         const rows = Array.from(
           table.querySelectorAll(
             `.cell:nth-child(${numCols}n+1):not(.row-header)`
@@ -425,7 +426,7 @@
 
       // Highlight cells with found titles
       function highlightFoundTitles(grid, foundTitles, excelData) {
-        const dataCells = grid.querySelectorAll(".data-cell");
+        const dataCells = dataGrid.querySelectorAll(".data-cell");
 
         foundTitles.forEach((title) => {
           //const [column, row] = title.position.split(/(\d+)/).filter(Boolean);
@@ -433,7 +434,6 @@
           const row = title.row;
           const rowIndex = row - 1;
           const cellIndex = column - 1;
-          debug([column, row, rowIndex, cellIndex]);
           const cell = dataCells[rowIndex * excelData[0].length + cellIndex];
           cell.classList.add("found-title");
         });
