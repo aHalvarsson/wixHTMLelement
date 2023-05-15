@@ -433,6 +433,7 @@
           const row = title.row;
           const rowIndex = row - 1;
           const cellIndex = column;
+          debug([column, row, rowIndex, cellIndex]);
           const cell = dataCells[rowIndex * row.length + cellIndex];
           cell.classList.add("found-title");
         });
@@ -849,6 +850,9 @@
             checkbox.checked = checkboxState;
           });
         }
+      }
+      function debug(array) {
+        array.forEach((item) => console.log(item.name + ": " + item));
       }
     </script>
   </body>
