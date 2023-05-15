@@ -290,7 +290,7 @@
         toggleSwitch.classList.add("toggle-switch");
         toggleSwitch.checked = "true";
         toggleSwitch.addEventListener("change", (event) => {
-          const thisToggle = event.target;
+          const thisToggle = event.currentTarget;
           handleToggleChange(thisToggle, foundTitles, excelData)}
         );
         const toggleLabel = document.createElement("label");
@@ -305,7 +305,7 @@
       // Handle toggle switch click
       function handleToggleChange(toggleSwitch, foundHeaders, excelData) {
         const headerRowIndex = foundHeaders[0].row;
-        debug([toggleSwitch]);
+        debug([JSON.stringify(toggleSwitch)]);
         const grid = toggleSwitch.closest(".grid");
         const dataGrid = grid.querySelector(".data-grid");
         const numCols = excelData[0].length + 1;
