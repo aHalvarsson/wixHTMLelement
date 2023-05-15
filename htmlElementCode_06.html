@@ -290,7 +290,7 @@
         toggleSwitch.classList.add("toggle-switch");
         toggleSwitch.checked = "true";
         toggleSwitch.addEventListener("change", (event) =>
-          handleToggleChange(event, foundTitles, excelData, grid)
+          handleToggleChange(event, foundTitles, excelData)
         );
         const toggleLabel = document.createElement("label");
         toggleLabel.appendChild(toggleSwitch);
@@ -302,13 +302,14 @@
       }
 
       // Handle toggle switch click
-      function handleToggleChange(event, foundHeaders, excelData, grid) {
+      function handleToggleChange(event, foundHeaders, excelData) {
         const headerRowIndex = foundHeaders[0].row;
-        const dataGrid = grid.querySelectorAll(".data-grid");
+        const toggleSwitch = event.target;
+        const grid = toggleSwitch.closest('.grid');
+        const dataGrid = grid.querySelector('.data-grid');
         const numCols = excelData[0].length + 1;
-        const dataCells = dataGrid.querySelectorAll(".data-cell");
         const rows = Array.from(
-          table.querySelectorAll(
+          dataGrid.querySelectorAll(
             `.cell:nth-child(${numCols}n+1):not(.row-header)`
           )
         );
