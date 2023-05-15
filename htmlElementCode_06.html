@@ -303,9 +303,8 @@
       }
 
       // Handle toggle switch click
-      function handleToggleChange(event, foundHeaders, excelData) {
+      function handleToggleChange(toggleSwitch, foundHeaders, excelData) {
         const headerRowIndex = foundHeaders[0].row;
-        const toggleSwitch = event.target;
         debug([toggleSwitch]);
         const grid = toggleSwitch.closest(".grid");
         const dataGrid = grid.querySelector(".data-grid");
