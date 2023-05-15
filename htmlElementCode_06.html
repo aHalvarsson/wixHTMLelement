@@ -290,7 +290,7 @@
         toggleSwitch.classList.add("toggle-switch");
         toggleSwitch.checked = "true";
         toggleSwitch.addEventListener("change", (event) => {
-          const thisToggle = event.currentTarget;
+          const thisToggle = event.target;
           handleToggleChange(thisToggle, foundTitles, excelData)}
         );
         const toggleLabel = document.createElement("label");
