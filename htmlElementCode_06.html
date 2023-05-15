@@ -277,7 +277,7 @@
           await addSaveButton(grid, file);
 
           // Start with the right rows visible
-          handleToggleChange(event, foundTitles, excelData);
+          handleToggleChange(foundTitles, excelData, grid);
 
           mainContainer.appendChild(grid);
         });
@@ -289,10 +289,9 @@
         toggleSwitch.setAttribute("type", "checkbox");
         toggleSwitch.classList.add("toggle-switch");
         toggleSwitch.checked = "true";
-        toggleSwitch.addEventListener("change", (event) => {
-          const thisToggle = event.target;
-          console.log(thisToggle);
-          handleToggleChange(thisToggle, foundTitles, excelData)}
+        toggleSwitch.addEventListener("change", event => {
+          
+          handleToggleChange(foundTitles, excelData, grid)}
         );
         const toggleLabel = document.createElement("label");
         toggleLabel.appendChild(toggleSwitch);
@@ -304,10 +303,10 @@
       }
 
       // Handle toggle switch click
-      function handleToggleChange(toggleSwitch, foundHeaders, excelData) {
+      function handleToggleChange(foundHeaders, excelData, grid) {
+        const toggleSwitch =  grid.querySelector(".toggle-switch");
+
         const headerRowIndex = foundHeaders[0].row;
-        debug([toggleSwitch]);
-        const grid = toggleSwitch.closest(".grid");
         const dataGrid = grid.querySelector(".data-grid");
         const numCols = excelData[0].length + 1;
         const rows = Array.from(
