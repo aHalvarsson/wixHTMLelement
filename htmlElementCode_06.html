@@ -305,7 +305,7 @@
       function handleToggleChange(event, foundHeaders, excelData) {
         const headerRowIndex = foundHeaders[0].row;
         const toggleSwitch = event.target;
-        debug(toggleSwitch);
+        debug([toggleSwitch]);
         const grid = toggleSwitch.closest(".grid");
         const dataGrid = grid.querySelector(".data-grid");
         const numCols = excelData[0].length + 1;
