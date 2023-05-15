@@ -262,7 +262,7 @@
           await createToggleSwitcher(grid);
 
           // Add highlight to the found titles
-          await highlightFoundTitles(grid, foundTitles);
+          await highlightFoundTitles(grid, foundTitles, excelData);
 
           // Make all data cells editable
           await makeCellsEditable(grid);
@@ -424,7 +424,7 @@
       }
 
       // Highlight cells with found titles
-      function highlightFoundTitles(grid, foundTitles) {
+      function highlightFoundTitles(grid, foundTitles, excelData) {
         const dataCells = grid.querySelectorAll(".data-cell");
 
         foundTitles.forEach((title) => {
@@ -432,9 +432,9 @@
           const column = title.col;
           const row = title.row;
           const rowIndex = row - 1;
-          const cellIndex = column;
+          const cellIndex = column - 1;
           debug([column, row, rowIndex, cellIndex]);
-          const cell = dataCells[rowIndex * row.length + cellIndex];
+          const cell = dataCells[rowIndex * excelData[0].length + cellIndex];
           cell.classList.add("found-title");
         });
       }
