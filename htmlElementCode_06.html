@@ -441,7 +441,7 @@
           const column = title.col;
           const row = title.row;
           const rowIndex = row - 1;
-          const cellIndex = column.charCodeAt(0) - "A".charCodeAt(0);
+          const cellIndex = column;
           const cell = dataCells[rowIndex * row.length + cellIndex];
           cell.classList.add("found-title");
         });
