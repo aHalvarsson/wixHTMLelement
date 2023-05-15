@@ -259,7 +259,7 @@
           await addData(dataGrid, excelData);
 
           // Add row toggle switch
-          await createToggleSwitcher(grid, dataGrid);
+          await createToggleSwitcher(grid);
 
           // Add highlight to the found titles
           await highlightFoundTitles(dataGrid, foundTitles, excelData);
@@ -284,13 +284,13 @@
       }
 
       // Creates a row toggle switch to every tab
-      function createToggleSwitcher(grid, dataGrid) {
+      function createToggleSwitcher(grid) {
         const toggleSwitch = document.createElement("input");
         toggleSwitch.setAttribute("type", "checkbox");
         toggleSwitch.classList.add("toggle-switch");
         toggleSwitch.checked = "true";
         toggleSwitch.addEventListener("change", (event) =>
-          handleToggleChange(event, foundTitles, excelData, dataGrid)
+          handleToggleChange(event, foundTitles, excelData, grid)
         );
         const toggleLabel = document.createElement("label");
         toggleLabel.appendChild(toggleSwitch);
@@ -302,9 +302,9 @@
       }
 
       // Handle toggle switch click
-      function handleToggleChange(event, foundHeaders, excelData, dataGrid) {
+      function handleToggleChange(event, foundHeaders, excelData, grid) {
         const headerRowIndex = foundHeaders[0].row;
-
+        const dataGrid = grid.querySelectorAll(".data-grid");
         const numCols = excelData[0].length + 1;
         const dataCells = dataGrid.querySelectorAll(".data-cell");
         const rows = Array.from(
