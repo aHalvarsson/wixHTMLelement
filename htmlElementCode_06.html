@@ -291,6 +291,7 @@
         toggleSwitch.checked = "true";
         toggleSwitch.addEventListener("change", (event) => {
           const thisToggle = event.target;
+          console.log(thisToggle);
           handleToggleChange(thisToggle, foundTitles, excelData)}
         );
         const toggleLabel = document.createElement("label");
@@ -305,7 +306,7 @@
       // Handle toggle switch click
       function handleToggleChange(toggleSwitch, foundHeaders, excelData) {
         const headerRowIndex = foundHeaders[0].row;
-        debug([JSON.stringify(toggleSwitch)]);
+        debug([toggleSwitch]);
         const grid = toggleSwitch.closest(".grid");
         const dataGrid = grid.querySelector(".data-grid");
         const numCols = excelData[0].length + 1;
@@ -854,7 +855,7 @@
         }
       }
       function debug(array) {
-        array.forEach((item) => console.log(item.name + ": " + item));
+        array.forEach((item) => console.log(item));
       }
     </script>
   </body>
