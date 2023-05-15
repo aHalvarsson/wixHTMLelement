@@ -205,14 +205,14 @@
       }
 
       // Create a grid for each Excel file
-      function createGrids(
+     function createGrids(
         excelFiles,
         foundTitles,
         sieHeaders,
         excelData,
         mainContainer
       ) {
-        excelFiles.forEach((file, index) => {
+        excelFiles.forEach(async(file, index) => {
           foundTitles = foundTitles[index];
           excelData = excelData[index];
           const grid = document.createElement("div");
@@ -253,37 +253,31 @@
           grid.appendChild(dataGrid);
 
           // Add column letters and row numbers
-          let range = {
-            start: "A1",
-            end:
-              String.fromCharCode(excelData[0].length) +
-              String(excelData.length),
-          };
-          addColumnLettersAndRowNumbers(grid, range);
+          await addColumnLettersAndRowNumbers(grid, excelData);
 
           // Add data from excelData array
-          addData(dataGrid, excelData);
+          await addData(dataGrid, excelData);
 
           // Add row toggle switch
-          createToggleSwitcher(grid);
+          await createToggleSwitcher(grid);
 
           // Add highlight to the found titles
-          highlightFoundTitles(grid, foundTitles);
+          await highlightFoundTitles(grid, foundTitles);
 
           // Make all data cells editable
-          makeCellsEditable(grid);
+          await makeCellsEditable(grid);
 
           // Enable drag and drop functionality
-          enableDragAndDrop(grid);
+          await enableDragAndDrop(grid);
 
           // Add disconnect buttons to SIE header boxes
-          addDisconnectButtons(grid);
+          await addDisconnectButtons(grid);
 
           // Add save button to grid
-          addSaveButton(grid, file);
+          await addSaveButton(grid, file);
 
           // Start with the right rows visible
-          handleToggleChange(event, foundHeaders, excelData);
+          await handleToggleChange(event, foundHeaders, excelData);
 
           mainContainer.appendChild(grid);
         });
@@ -364,15 +358,22 @@
       }
 
       // Add column letters and row numbers to data grid
-      function addColumnLettersAndRowNumbers(grid, range) {
+      function addColumnLettersAndRowNumbers(grid, excelData) {
         const dataGrid = grid.querySelector(".data-grid");
 
         // Get range dimensions
-        const [startColumn, startRow] = range.start
+        /*const [startColumn, startRow] = range.start
           .split(/(\d+)/)
           .filter(Boolean);
         const [endColumn, endRow] = range.end.split(/(\d+)/).filter(Boolean);
         const columnCount =
+          endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
+*/
+          const startColumn = XLSX.utils.encodeColumn(0);
+          const startRow = XLSX.utils.encodeRow(0);
+          const endColumn = XLSX.utils.encodeColumn(excelData[0].length);
+          const endRow = XLSX.utils.encodeRow(excelData.length);
+          const columnCount =
           endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
         const rowCount = endRow - startRow + 1;
 
