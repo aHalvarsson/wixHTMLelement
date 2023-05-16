@@ -575,8 +575,8 @@
       // Generate a color from the color wheel
       function getColorFromColorWheel(position) {
         
-        return hsla(position, 100, 44, 1)
-
+        const color = hsl(position, 100%, 44%);
+        return color;
       }
       // Handle drag end
       function handleDragEnd(event) {
