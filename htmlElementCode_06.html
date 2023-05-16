@@ -404,6 +404,7 @@
           for (let j = 0; j < columnCount; j++) {
             const cell = document.createElement("div");
             cell.classList.add("cell", "data-cell");
+            console.log(excelData);
             let cellValue = excelData[i][j];
             cell.textContent = formatCellValue(cellValue);
             dataGrid.appendChild(cell);
