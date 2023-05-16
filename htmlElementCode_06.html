@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       /* Styling for the interface grid/table */
-      .table {
+      .dataGrid {
         display: grid;
         grid-template-columns: repeat(
           calc(var(--num-cols) + 1),
@@ -25,10 +25,6 @@
 
       .visible {
         display: grid;
-      }
-
-      .alwaysVisibleRows {
-        display: grid !important;
       }
 
       .cell {
@@ -55,13 +51,13 @@
       }
 
       /* Styling for the SIE headers section */
-      .sie-headers {
+      .sie-header-boxes {
         position: relative;
         margin-top: 10px;
         width: auto;
       }
 
-      .sie-header {
+      .sie-header-box {
         display: inline-block;
         padding: 5px;
         border: 1px solid black;
@@ -250,6 +246,8 @@
           // Create data grid
           const dataGrid = document.createElement("div");
           dataGrid.classList.add("data-grid");
+          dataGrid.style.display = "grid";
+          dataGrid.style.setProperty("--num-cols", excelData[0].length);
           grid.appendChild(dataGrid);
 
           // Add column letters and row numbers
