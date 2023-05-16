@@ -540,8 +540,8 @@
       }
 
       function setStartLinkConnection(foundHeaders, excelData, grid) {
-        const dataGrid = grid.querySelectorAll(".data-grid");
-        const dataCell = dataGrid.querySelectorAll(".data-cell");
+        const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
+        const dataCell = Array.from(dataGrid[0].querySelectorAll(".data-cell"));
         
         foundHeaders.forEach((header, index) => {
           console.log(header);
