@@ -577,7 +577,7 @@
         cell.style.borderColor = borderColor;
         cell.style.backgroundColor = bgColor;
         sieHeaderBox.style.borderColor = borderColor;
-        sieHeaderBox.style.bckgroundColor = bgColor;
+        sieHeaderBox.style.backgroundColor = bgColor;
 
       }
 
@@ -618,7 +618,7 @@
       // Handle disconnect click
       function handleDisconnectClick(event) {
         const box = event.target.parentElement;
-        const data = box.textContent;
+        let data = box.textContent;
         const dataX = data.slice(0, data.lastIndexOf("X"));
         data = dataX;
         const linkedCell = document.querySelector(
