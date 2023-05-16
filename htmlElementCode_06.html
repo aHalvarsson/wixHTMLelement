@@ -361,21 +361,7 @@
       // Add column letters and row numbers to data grid
       function addColumnLettersAndRowNumbers(grid, excelData) {
         const dataGrid = grid.querySelector(".data-grid");
-
-        // Get range dimensions
-        /*const [startColumn, startRow] = range.start
-          .split(/(\d+)/)
-          .filter(Boolean);
-        const [endColumn, endRow] = range.end.split(/(\d+)/).filter(Boolean);
-        const columnCount =
-          endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
-*/
-          const startColumn = XLSX.utils.decode_col(0);
-          const startRow = XLSX.utils.decode_row(0);
-          const endColumn = XLSX.utils.decode_col(excelData[0].length);
-          const endRow = XLSX.utils.decode_row(excelData.length);
-          //const columnCount =
-          endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
+        
         //const rowCount = endRow - startRow + 1;
         const colCount = excelData[0].length;
         const rowCount = excelData.length;
