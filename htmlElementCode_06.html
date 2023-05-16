@@ -528,6 +528,8 @@
         if (previousLink) {
           previousLink.removeAttribute("data-sie-header");
           previousLink.removeAttribute("data-connection-color");
+          previousLink.style.borderColor = "";
+          previousLink.style.backgroundColor = "";
           previousLink.classList.remove("linked-cell");
 
           // Remove data-connection-color attribute and styles from SIE header box
@@ -575,14 +577,14 @@
         cell.style.borderColor = borderColor;
         cell.style.backgroundColor = bgColor;
         sieHeaderBox.style.borderColor = borderColor;
-        sieHeaderBox.style.borderColor = bgColor;
+        sieHeaderBox.style.bckgroundColor = bgColor;
 
       }
 
       // Generate a color from the color wheel
       function getColorFromColorWheel(position) {
-    const borderColor = `hsl(${position * 20}, 100%, 44%)`;
-    const bgColor = `hsl(${position * 20}, 100%, 85%)`;
+    const borderColor = `hsl(${position * 30}, 100%, 44%)`;
+    const bgColor = `hsl(${position * 30}, 100%, 90%)`;
     // Increment color wheel position
     colorWheelPosition++;
     return [borderColor, bgColor];
@@ -617,6 +619,8 @@
       function handleDisconnectClick(event) {
         const box = event.target.parentElement;
         const data = box.textContent;
+        const dataX = data.slice(0, data.lastIndexOf("X"));
+        data = dataX;
         const linkedCell = document.querySelector(
           `[data-sie-header="${data}"]`
         );
