@@ -544,10 +544,13 @@
         const dataCell = dataGrid.querySelectorAll(".data-cell");
         
         foundHeaders.forEach((header, index) => {
+          console.log(header);
           const cell = dataCell[header.row * excelData[0].length + header.col];
+          console.log(cell);
           const sieHeaderBox = Array.from(
           document.querySelectorAll(".sie-header-box")
         ).find((el) => el.textContent.includes(header.value));
+        console.log(sieHeaderBox);
         setLinkConnection(cell, header.value, sieHeaderBox);
         });
       }
