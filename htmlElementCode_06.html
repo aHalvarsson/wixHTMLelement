@@ -391,9 +391,9 @@
           cell.textContent = String.fromCharCode(startColumn.charCodeAt(0) + i);
           dataGrid.appendChild(cell);
         }
-        console.log(excelData);
+        
         // Create row number cells and data cells
-        for (let i = 0; i < rowCount; i++) {
+        for (let i = 0; i < excelData.length; i++) {
           // Create row number cell
           const rowNumberCell = document.createElement("div");
           rowNumberCell.classList.add("cell", "row-number-cell");
@@ -401,7 +401,7 @@
           dataGrid.appendChild(rowNumberCell);
 
           // Create data cells
-          for (let j = 0; j < columnCount; j++) {
+          for (let j = 0; j < excelData[0].length; j++) {
             const cell = document.createElement("div");
             cell.classList.add("cell", "data-cell");
             
