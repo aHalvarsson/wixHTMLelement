@@ -16,7 +16,8 @@
         );
         grid-auto-rows: minmax(35px, auto);
         grid-gap: 0;
-        border: 1px solid black;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
       }
 
       .hidden {
@@ -29,7 +30,9 @@
 
       .cell {
         padding: 3px;
-        border: 1px solid black;
+        text-align: right;
+        border-right: 1px solid black;
+        border-bottom: 1px solid black;
       }
 
       .rowsCols {
@@ -124,8 +127,12 @@
       .guess {
         color: lightgray;
       }
-      .found-title {
-        background-color: yellow;
+      input[type=text] {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background-color: #FFFFFF00;
+        font-size: inherit;
       }
     </style>
     <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -253,13 +260,6 @@
           // Add column letters and row numbers
           await addColumnLettersAndRowNumbers(grid, excelData);
 
-          // Add data from excelData array
-          //await addData(dataGrid, excelData);
-
-          // Add highlight to the found titles
-          // await highlightFoundTitles(dataGrid, foundTitles, excelData);
-
-          // Make all data cells editable
           await makeCellsEditable(grid);
 
           // Enable drag and drop functionality
@@ -404,20 +404,6 @@
         }
       }
 
-      // Highlight cells with found titles
-      function highlightFoundTitles(dataGrid, foundTitles, excelData) {
-        const dataCells = dataGrid.querySelectorAll(".data-cell");
-
-        foundTitles.forEach((title) => {
-          //const [column, row] = title.position.split(/(\d+)/).filter(Boolean);
-          const column = title.col;
-          const row = title.row;
-          const rowIndex = row - 1;
-          const cellIndex = column - 1;
-          const cell = dataCells[rowIndex * excelData[0].length + cellIndex];
-          cell.classList.add("found-title");
-        });
-      }
 
       // Make all data cells editable
       function makeCellsEditable(grid) {
@@ -526,20 +512,51 @@
           `[data-sie-header="${data}"]`
         );
         if (previousLink) {
-          previousLink.removeAttribute("data-sie-header");
-          previousLink.removeAttribute("data-connection-color");
-          previousLink.style.borderColor = "";
-          previousLink.style.backgroundColor = "";
-          previousLink.classList.remove("linked-cell");
+          
+          breakSIEconnection(previousLink, sieHeaderBox);
+        }
+        setLinkConnection(cell, data, sieHeaderBox);
+        
+      }
+
+      function breakSIEconnection(cell, sieHeaderBox) {
+          cell.removeAttribute("data-sie-header");
+          cell.removeAttribute("data-connection-color");
+          cell.style.borderColor = "";
+          cell.style.backgroundColor = "";
+          cell.classList.remove("linked-cell");
 
           // Remove data-connection-color attribute and styles from SIE header box
           sieHeaderBox.removeAttribute("data-connection-color");
           sieHeaderBox.style.borderColor = "";
           sieHeaderBox.style.backgroundColor = "";
-        }
-        setLinkConnection(cell, data, sieHeaderBox);
-        
+
+          // Remove event listeners
+    cell.removeEventListener('mouseenter', cell.highlight);
+    cell.removeEventListener('mouseleave', cell.unhighlight);
+    sieHeaderBox.removeEventListener('mouseenter', sieHeaderBox.highlight);
+    sieHeaderBox.removeEventListener('mouseleave', sieHeaderBox.unhighlight);
+
+    // Delete the stored functions
+    delete cell.highlight;
+    delete cell.unhighlight;
+    delete sieHeaderBox.highlight;
+    delete sieHeaderBox.unhighlight;
       }
+
+      function highlight(el1, el2) {
+    el1.style.transform = 'scale(1.1)';  // or any other effect
+    el2.style.transform = 'scale(1.1)';  // or any other effect
+    el1.style.boxShadow = '0 0 10px #000';  // or any other effect
+    el2.style.boxShadow = '0 0 10px #000';  // or any other effect
+}
+
+function unhighlight(el1, el2) {
+    el1.style.transform = '';
+    el2.style.transform = '';
+    el1.style.boxShadow = '';
+    el2.style.boxShadow = '';
+}
 
       function setStartLinkConnection(foundHeaders, excelData, grid) {
         const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
@@ -578,6 +595,21 @@
         cell.style.backgroundColor = bgColor;
         sieHeaderBox.style.borderColor = borderColor;
         sieHeaderBox.style.backgroundColor = bgColor;
+
+        // Create and store the listener functions
+    const highlight = () => highlightLinked(sieHeaderBox, cell);
+    const unhighlight = () => unhighlightLinked(sieHeaderBox, cell);
+
+    cell.highlight = highlight;
+    cell.unhighlight = unhighlight;
+    sieHeaderBox.highlight = highlight;
+    sieHeaderBox.unhighlight = unhighlight;
+
+    // Add event listeners for hover effect
+    cell.addEventListener('mouseenter', highlight);
+    cell.addEventListener('mouseleave', unhighlight);
+    sieHeaderBox.addEventListener('mouseenter', highlight);
+    sieHeaderBox.addEventListener('mouseleave', unhighlight);
 
       }
 
@@ -624,15 +656,12 @@
         const linkedCell = document.querySelector(
           `[data-sie-header="${data}"]`
         );
-        console.log(box + " " + data + " " + linkedCell);
+        
         // Disconnect link
         if (linkedCell) {
-          linkedCell.removeAttribute("data-sie-header");
-          linkedCell.classList.remove("linked-cell");
+          breakSIEconnection(linkedCell, box)
         }
 
-        // Update SIE header box
-        box.classList.remove("linked-box");
       }
 
       // Format cell value
