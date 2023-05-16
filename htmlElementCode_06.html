@@ -201,14 +201,14 @@
       }
 
       // Create a grid for each Excel file
-     function createGrids(
+      function createGrids(
         excelFiles,
         foundTitles,
         sieHeaders,
         excelData,
         mainContainer
       ) {
-        excelFiles.forEach(async(file, index) => {
+        excelFiles.forEach(async (file, index) => {
           foundTitles = foundTitles[index];
           excelData = excelData[index];
           const grid = document.createElement("div");
@@ -257,7 +257,7 @@
           //await addData(dataGrid, excelData);
 
           // Add highlight to the found titles
-          await highlightFoundTitles(dataGrid, foundTitles, excelData);
+          // await highlightFoundTitles(dataGrid, foundTitles, excelData);
 
           // Make all data cells editable
           await makeCellsEditable(grid);
@@ -274,6 +274,9 @@
           // Add row toggle switch
           await createToggleSwitcher(foundTitles, excelData, grid);
 
+          // Set start link connection with guessed headers and SIE-headers
+          setStartLinkConnection(foundHeaders, excelData)
+
           // Start with the right rows visible
           handleToggleChange(foundTitles, excelData, grid);
 
@@ -287,10 +290,9 @@
         toggleSwitch.setAttribute("type", "checkbox");
         toggleSwitch.classList.add("toggle-switch");
         toggleSwitch.checked = "true";
-        toggleSwitch.addEventListener("change", event => {
-          
-          handleToggleChange(foundTitles, excelData, grid)}
-        );
+        toggleSwitch.addEventListener("change", (event) => {
+          handleToggleChange(foundTitles, excelData, grid);
+        });
         const toggleLabel = document.createElement("label");
         toggleLabel.appendChild(toggleSwitch);
 
@@ -302,7 +304,7 @@
 
       // Handle toggle switch click
       function handleToggleChange(foundHeaders, excelData, grid) {
-        const toggleSwitch =  grid.querySelector(".toggle-switch");
+        const toggleSwitch = grid.querySelector(".toggle-switch");
 
         const headerRowIndex = foundHeaders[0].row;
         const dataGrid = grid.querySelector(".data-grid");
@@ -361,11 +363,10 @@
       // Add column letters and row numbers to data grid
       function addColumnLettersAndRowNumbers(grid, excelData) {
         const dataGrid = grid.querySelector(".data-grid");
-        
+
         //const rowCount = endRow - startRow + 1;
         const colCount = excelData[0].length;
         const rowCount = excelData.length;
-
 
         // Create top-left corner cell
         const cornerCell = document.createElement("div");
@@ -379,45 +380,28 @@
           cell.textContent = String.fromCharCode(65 + i);
           dataGrid.appendChild(cell);
         }
-        
+
         // Create row number cells and data cells
         for (let i = 0; i < rowCount; i++) {
           // Create row number cell
-          
 
           // Create data cells
           for (let j = -1; j < colCount; j++) {
-          if(j === -1) {
-          const rowNumberCell = document.createElement("div");
-          rowNumberCell.classList.add("cell", "row-number-cell");
-          rowNumberCell.textContent = i + 1;
-          dataGrid.appendChild(rowNumberCell);
+            if (j === -1) {
+              const rowNumberCell = document.createElement("div");
+              rowNumberCell.classList.add("cell", "row-number-cell");
+              rowNumberCell.textContent = i + 1;
+              dataGrid.appendChild(rowNumberCell);
             } else {
+              const cell = document.createElement("div");
+              cell.classList.add("cell", "data-cell");
 
-            const cell = document.createElement("div");
-            cell.classList.add("cell", "data-cell");
-            
-            let cellValue = excelData[i][j];
-            cell.textContent = formatCellValue(cellValue);
-            dataGrid.appendChild(cell);
+              let cellValue = excelData[i][j];
+              cell.textContent = formatCellValue(cellValue);
+              dataGrid.appendChild(cell);
             }
           }
         }
-      }
-
-      // Add data from excelData array to data grid
-      function addData(dataGrid, excelData) {
-        const dataCells = dataGrid.querySelectorAll(".data-cell");
-
-        excelData.forEach((row, rowIndex) => {
-          row.forEach((cellValue, cellIndex) => {
-            
-            if(cellValue === null || cellValue === undefined) cellValue = "";
-            
-            const cell = dataCells[rowIndex * row.length + cellIndex];
-            cell.textContent = formatCellValue(cellValue);
-          });
-        });
       }
 
       // Highlight cells with found titles
@@ -532,7 +516,9 @@
         let data = event.dataTransfer.getData("text/plain");
         const dataX = data.slice(0, data.lastIndexOf("X"));
         data = dataX;
-        const sieHeaderBox = Array.from(document.querySelectorAll(".sie-header-box")).find(el => el.textContent.includes(data));
+        const sieHeaderBox = Array.from(
+          document.querySelectorAll(".sie-header-box")
+        ).find((el) => el.textContent.includes(data));
         const cell = event.target;
 
         // Disconnect previous link
@@ -548,13 +534,32 @@
           sieHeaderBox.removeAttribute("data-connection-color");
           sieHeaderBox.style.borderColor = "";
         }
+        setLinkConnection(cell, data, sieHeaderBox);
+        // Increment color wheel position
+        colorWheelPosition++;
+      }
+
+      function setStartLinkConnection(foundHeaders, excelData) {
+
+        const dataCell = dataGrid.querySelectorAll(".data-cell");
+        
+        foundHeaders.forEach((header, index) => {
+          const cell = dataCell[header.row * excelData[0].length + header.col];
+          const sieHeaderBox = Array.from(
+          document.querySelectorAll(".sie-header-box")
+        ).find((el) => el.textContent.includes(header.value));
+        setLinkConnection(cell, header.value, sieHeaderBox);
+        });
+      }
+
+      function setLinkConnection(cell, data, sieHeaderBox) {
 
         // Connect new link
         cell.setAttribute("data-sie-header", data);
         cell.classList.add("linked-cell");
 
         // Generate the next color in the color wheel
-        const color = getColorFromColorWheel(colorWheelPosition);
+        const color = getColorFromColorWheel(colorWheelPosition * 20);
         cell.setAttribute("data-connection-color", color);
 
         // Update SIE header box
@@ -565,27 +570,13 @@
         cell.style.borderColor = color;
         sieHeaderBox.style.borderColor = color;
 
-        // Increment color wheel position
-        colorWheelPosition++;
       }
 
       // Generate a color from the color wheel
       function getColorFromColorWheel(position) {
-        // Array of colors in the color wheel
-        const colors = [
-          "red",
-          "orange",
-          "yellow",
-          "green",
-          "blue",
-          "indigo",
-          "violet",
-        ];
+        
+        return hsla(position, 100, 44, 1)
 
-        // Get the color at the specified position in the color wheel
-        const color = colors[position % colors.length];
-
-        return color;
       }
       // Handle drag end
       function handleDragEnd(event) {
@@ -654,9 +645,9 @@
 
       // Format date value
       function formatDate(value) {
-        const options = { year: "numeric", month: "short", day: "numeric" };
-        return value.toLocaleDateString("en-US", options);
-      }
+  const options = { year: "numeric", month: "short", day: "numeric" };
+  return value.toLocaleDateString("sv-SE", options);
+}
 
       // Check if value is a number
       function isNumber(value) {
@@ -665,7 +656,7 @@
 
       // Format number value
       function formatNumber(value) {
-        return value.toLocaleString("en-US");
+        return value.toLocaleString("sv-SE");
       }
 
       // Add save button to grid
@@ -673,7 +664,7 @@
         const saveButton = document.createElement("button");
         saveButton.textContent = "Save Changes";
         saveButton.addEventListener("click", () => handleSaveClick(grid, file));
-        grid.appendChild(saveButton);
+        grid.insertAdjacentElement("afterbegin", saveButton);
       }
 
       // Handle save click
