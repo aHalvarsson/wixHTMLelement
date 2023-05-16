@@ -14,9 +14,9 @@
       /* Styling for the interface grid/table */
       .data-grid {
         display: grid;
-        grid-template-columns: repeat(
-          calc(var(--num-cols) + 1),
-          minmax(min-content, auto)
+        grid-template-columns: 1.2rem repeat(
+          calc(var(--num-cols)),
+          minmax(1.2rem, auto)
         );
         grid-auto-rows: minmax(25px, auto);
         grid-gap: 0;
@@ -368,15 +368,16 @@
         const rowCount = excelData.length;
 
         // Create top-left corner cell
-        const cornerCell = document.createElement("div");
+        /*const cornerCell = document.createElement("div");
         cornerCell.classList.add("cell", "corner-cell");
-        dataGrid.appendChild(cornerCell);
+        dataGrid.appendChild(cornerCell);*/
 
         // Create column letter cells
-        for (let i = 0; i < colCount; i++) {
+        for (let i = -1; i < colCount; i++) {
           const cell = document.createElement("div");
           cell.classList.add("cell", "column-letter-cell");
-          cell.textContent = String.fromCharCode(65 + i);
+          if(i > -1) cell.textContent = String.fromCharCode(65 + i);
+          else cell.textContent = "";
           dataGrid.appendChild(cell);
         }
 
