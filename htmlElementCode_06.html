@@ -533,10 +533,10 @@
           // Remove data-connection-color attribute and styles from SIE header box
           sieHeaderBox.removeAttribute("data-connection-color");
           sieHeaderBox.style.borderColor = "";
+          sieHeaderBox.style.backgroundColor = "";
         }
         setLinkConnection(cell, data, sieHeaderBox);
-        // Increment color wheel position
-        colorWheelPosition++;
+        
       }
 
       function setStartLinkConnection(foundHeaders, excelData, grid) {
@@ -544,15 +544,13 @@
         const dataCell = Array.from(dataGrid[0].querySelectorAll(".data-cell"));
         
         foundHeaders.forEach((header, index) => {
-          console.log(header);
-          console.log(excelData[0].length);
-          console.log(header.row * excelData[0].length + header.col);
-          const cell = dataCell[header.row * excelData[0].length + header.col];
-          console.log(cell);
+          
+          const cell = dataCell[(header.row - 1) * excelData[0].length + header.col];
+          
           const sieHeaderBox = Array.from(
           grid.querySelectorAll(".sie-header-box")
         ).find((el) => el.textContent.includes(header.value));
-        console.log(sieHeaderBox);
+        
         setLinkConnection(cell, header.value, sieHeaderBox);
         });
       }
@@ -564,23 +562,30 @@
         cell.classList.add("linked-cell");
 
         // Generate the next color in the color wheel
-        const color = getColorFromColorWheel(colorWheelPosition * 20);
-        cell.setAttribute("data-connection-color", color);
+        const colors = getColorFromColorWheel(colorWheelPosition);
+        const borderColor = colors[0];
+        const bgColor = colors[1];
+        cell.setAttribute("data-connection-color", borderColor);
 
         // Update SIE header box
         sieHeaderBox.classList.add("linked-box");
-        sieHeaderBox.setAttribute("data-connection-color", color);
+        sieHeaderBox.setAttribute("data-connection-color", borderColor);
 
         // Set styles for linked cell and SIE header box
-        cell.style.borderColor = color;
-        sieHeaderBox.style.borderColor = color;
+        cell.style.borderColor = borderColor;
+        cell.style.backgroundColor = bgColor;
+        sieHeaderBox.style.borderColor = borderColor;
+        sieHeaderBox.style.borderColor = bgColor;
 
       }
 
       // Generate a color from the color wheel
       function getColorFromColorWheel(position) {
-    const color = `hsl(${position}, 100%, 44%)`;
-    return color;
+    const borderColor = `hsl(${position * 20}, 100%, 44%)`;
+    const bgColor = `hsl(${position * 20}, 100%, 85%)`;
+    // Increment color wheel position
+    colorWheelPosition++;
+    return [borderColor, bgColor];
 }
       // Handle drag end
       function handleDragEnd(event) {
@@ -615,7 +620,7 @@
         const linkedCell = document.querySelector(
           `[data-sie-header="${data}"]`
         );
-
+        console.log(box + " " + data + " " + linkedCell);
         // Disconnect link
         if (linkedCell) {
           linkedCell.removeAttribute("data-sie-header");
