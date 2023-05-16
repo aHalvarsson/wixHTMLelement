@@ -374,9 +374,11 @@
           const startRow = XLSX.utils.encode_row(0);
           const endColumn = XLSX.utils.encode_col(excelData[0].length);
           const endRow = XLSX.utils.encode_row(excelData.length);
-          const columnCount =
+          //const columnCount =
           endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
-        const rowCount = endRow - startRow + 1;
+        //const rowCount = endRow - startRow + 1;
+        const colCount = excelData[0].length;
+        const rowCount = excelData.length;
 
 
         // Create top-left corner cell
@@ -385,7 +387,7 @@
         dataGrid.appendChild(cornerCell);
 
         // Create column letter cells
-        for (let i = 0; i < columnCount; i++) {
+        for (let i = 0; i < colCount; i++) {
           const cell = document.createElement("div");
           cell.classList.add("cell", "column-letter-cell");
           cell.textContent = String.fromCharCode(startColumn.charCodeAt(0) + i);
@@ -393,21 +395,26 @@
         }
         
         // Create row number cells and data cells
-        for (let i = 0; i < excelData.length; i++) {
+        for (let i = 0; i < rowCount; i++) {
           // Create row number cell
+          
+
+          // Create data cells
+          for (let j = -1; j < colCount; j++) {
+          if(j === -1) {
           const rowNumberCell = document.createElement("div");
           rowNumberCell.classList.add("cell", "row-number-cell");
           rowNumberCell.textContent = startRow + i;
           dataGrid.appendChild(rowNumberCell);
+            } else {
 
-          // Create data cells
-          for (let j = 0; j < excelData[0].length; j++) {
             const cell = document.createElement("div");
             cell.classList.add("cell", "data-cell");
             
             let cellValue = excelData[i][j];
             cell.textContent = formatCellValue(cellValue);
             dataGrid.appendChild(cell);
+            }
           }
         }
       }
