@@ -7,6 +7,10 @@
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
+      :root {
+        font-size: 16px;
+      }
+
       /* Styling for the interface grid/table */
       .data-grid {
         display: grid;
@@ -14,7 +18,7 @@
           calc(var(--num-cols) + 1),
           minmax(min-content, auto)
         );
-        grid-auto-rows: minmax(35px, auto);
+        grid-auto-rows: minmax(25px, auto);
         grid-gap: 0;
         border-top: 1px solid black;
         border-left: 1px solid black;
@@ -31,18 +35,19 @@
       .cell {
         padding: 3px;
         text-align: right;
+        vertical-align: middle;
         border-right: 1px solid black;
         border-bottom: 1px solid black;
       }
 
-      .rowsCols {
-        font-weight: bold;
-        background-color: #acacac;
-        border: 1px solid black;
+      .column-letter-cell, .corner-cell {
+        height: 1.2rem;
+        background-color: #636363;
       }
 
-      .found-header {
-        background-color: yellow;
+      .row-number-cell, .corner-cell {
+        width: 0.8rem;
+        background-color: #636363;
       }
 
       .toggle-container {
@@ -67,19 +72,13 @@
         cursor: move;
       }
 
-      .linked {
-        border: 2px solid blue;
-      }
+    
 
       /* Styling for the Save changes buttons */
       button {
         margin-top: 10px;
       }
 
-      #table-container {
-        width: 100%;
-        height: auto;
-      }
       .tabs {
         width: 100%;
         height: 3rem;
@@ -127,11 +126,11 @@
       .guess {
         color: lightgray;
       }
-      input[type=text] {
+      input[type="text"] {
         width: 100%;
         height: 100%;
         border: none;
-        background-color: #FFFFFF00;
+        background-color: #ffffff00;
         font-size: inherit;
       }
     </style>
@@ -275,7 +274,7 @@
           await createToggleSwitcher(foundTitles, excelData, grid);
 
           // Set start link connection with guessed headers and SIE-headers
-          setStartLinkConnection(foundTitles, excelData, grid)
+          setStartLinkConnection(foundTitles, excelData, grid);
 
           // Start with the right rows visible
           handleToggleChange(foundTitles, excelData, grid);
@@ -404,7 +403,6 @@
         }
       }
 
-
       // Make all data cells editable
       function makeCellsEditable(grid) {
         const dataCells = grid.querySelectorAll(".data-cell");
@@ -512,70 +510,70 @@
           `[data-sie-header="${data}"]`
         );
         if (previousLink) {
-          
           breakSIEconnection(previousLink, sieHeaderBox);
         }
         setLinkConnection(cell, data, sieHeaderBox);
-        
       }
 
       function breakSIEconnection(cell, sieHeaderBox) {
-          cell.removeAttribute("data-sie-header");
-          cell.removeAttribute("data-connection-color");
-          cell.style.borderColor = "";
-          cell.style.backgroundColor = "";
-          cell.classList.remove("linked-cell");
+        cell.removeAttribute("data-sie-header");
+        cell.removeAttribute("data-connection-color");
+        cell.style.borderColor = "";
+        cell.style.backgroundColor = "";
+        cell.classList.remove("linked-cell");
 
-          // Remove data-connection-color attribute and styles from SIE header box
-          sieHeaderBox.removeAttribute("data-connection-color");
-          sieHeaderBox.style.borderColor = "";
-          sieHeaderBox.style.backgroundColor = "";
+        // Remove data-connection-color attribute and styles from SIE header box
+        sieHeaderBox.removeAttribute("data-connection-color");
+        sieHeaderBox.style.borderColor = "";
+        sieHeaderBox.style.backgroundColor = "";
 
-          // Remove event listeners
-    cell.removeEventListener('mouseenter', cell.highlight);
-    cell.removeEventListener('mouseleave', cell.unhighlight);
-    sieHeaderBox.removeEventListener('mouseenter', sieHeaderBox.highlight);
-    sieHeaderBox.removeEventListener('mouseleave', sieHeaderBox.unhighlight);
+        // Remove event listeners
+        cell.removeEventListener("mouseenter", cell.highlight);
+        cell.removeEventListener("mouseleave", cell.unhighlight);
+        sieHeaderBox.removeEventListener("mouseenter", sieHeaderBox.highlight);
+        sieHeaderBox.removeEventListener(
+          "mouseleave",
+          sieHeaderBox.unhighlight
+        );
 
-    // Delete the stored functions
-    delete cell.highlight;
-    delete cell.unhighlight;
-    delete sieHeaderBox.highlight;
-    delete sieHeaderBox.unhighlight;
+        // Delete the stored functions
+        delete cell.highlight;
+        delete cell.unhighlight;
+        delete sieHeaderBox.highlight;
+        delete sieHeaderBox.unhighlight;
       }
 
-      function highlight(el1, el2) {
-    el1.style.transform = 'scale(1.1)';  // or any other effect
-    el2.style.transform = 'scale(1.1)';  // or any other effect
-    el1.style.boxShadow = '0 0 10px #000';  // or any other effect
-    el2.style.boxShadow = '0 0 10px #000';  // or any other effect
-}
+      function highlightLinked(el1, el2) {
+        el1.style.transform = "scale(1.1)"; // or any other effect
+        el2.style.transform = "scale(1.1)"; // or any other effect
+        el1.style.boxShadow = "0 0 10px #000"; // or any other effect
+        el2.style.boxShadow = "0 0 10px #000"; // or any other effect
+      }
 
-function unhighlight(el1, el2) {
-    el1.style.transform = '';
-    el2.style.transform = '';
-    el1.style.boxShadow = '';
-    el2.style.boxShadow = '';
-}
+      function unhighlightLinked(el1, el2) {
+        el1.style.transform = "";
+        el2.style.transform = "";
+        el1.style.boxShadow = "";
+        el2.style.boxShadow = "";
+      }
 
       function setStartLinkConnection(foundHeaders, excelData, grid) {
         const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
         const dataCell = Array.from(dataGrid[0].querySelectorAll(".data-cell"));
-        
+
         foundHeaders.forEach((header, index) => {
-          
-          const cell = dataCell[(header.row - 1) * excelData[0].length + header.col];
-          
+          const cell =
+            dataCell[(header.row - 1) * excelData[0].length + header.col];
+
           const sieHeaderBox = Array.from(
-          grid.querySelectorAll(".sie-header-box")
-        ).find((el) => el.textContent.includes(header.value));
-        
-        setLinkConnection(cell, header.value, sieHeaderBox);
+            grid.querySelectorAll(".sie-header-box")
+          ).find((el) => el.textContent.includes(header.value));
+
+          setLinkConnection(cell, header.value, sieHeaderBox);
         });
       }
 
       function setLinkConnection(cell, data, sieHeaderBox) {
-
         // Connect new link
         cell.setAttribute("data-sie-header", data);
         cell.classList.add("linked-cell");
@@ -597,30 +595,29 @@ function unhighlight(el1, el2) {
         sieHeaderBox.style.backgroundColor = bgColor;
 
         // Create and store the listener functions
-    const highlight = () => highlightLinked(sieHeaderBox, cell);
-    const unhighlight = () => unhighlightLinked(sieHeaderBox, cell);
+        const highlight = () => highlightLinked(sieHeaderBox, cell);
+        const unhighlight = () => unhighlightLinked(sieHeaderBox, cell);
 
-    cell.highlight = highlight;
-    cell.unhighlight = unhighlight;
-    sieHeaderBox.highlight = highlight;
-    sieHeaderBox.unhighlight = unhighlight;
+        cell.highlight = highlight;
+        cell.unhighlight = unhighlight;
+        sieHeaderBox.highlight = highlight;
+        sieHeaderBox.unhighlight = unhighlight;
 
-    // Add event listeners for hover effect
-    cell.addEventListener('mouseenter', highlight);
-    cell.addEventListener('mouseleave', unhighlight);
-    sieHeaderBox.addEventListener('mouseenter', highlight);
-    sieHeaderBox.addEventListener('mouseleave', unhighlight);
-
+        // Add event listeners for hover effect
+        cell.addEventListener("mouseenter", highlight);
+        cell.addEventListener("mouseleave", unhighlight);
+        sieHeaderBox.addEventListener("mouseenter", highlight);
+        sieHeaderBox.addEventListener("mouseleave", unhighlight);
       }
 
       // Generate a color from the color wheel
       function getColorFromColorWheel(position) {
-    const borderColor = `hsl(${position * 30}, 100%, 44%)`;
-    const bgColor = `hsl(${position * 30}, 100%, 90%)`;
-    // Increment color wheel position
-    colorWheelPosition++;
-    return [borderColor, bgColor];
-}
+        const borderColor = `hsl(${position * 30}, 100%, 44%)`;
+        const bgColor = `hsl(${position * 30}, 100%, 90%)`;
+        // Increment color wheel position
+        colorWheelPosition++;
+        return [borderColor, bgColor];
+      }
       // Handle drag end
       function handleDragEnd(event) {
         const box = event.target;
@@ -656,12 +653,11 @@ function unhighlight(el1, el2) {
         const linkedCell = document.querySelector(
           `[data-sie-header="${data}"]`
         );
-        
+
         // Disconnect link
         if (linkedCell) {
-          breakSIEconnection(linkedCell, box)
+          breakSIEconnection(linkedCell, box);
         }
-
       }
 
       // Format cell value
@@ -687,9 +683,9 @@ function unhighlight(el1, el2) {
 
       // Format date value
       function formatDate(value) {
-  const options = { year: "numeric", month: "short", day: "numeric" };
-  return value.toLocaleDateString("sv-SE", options);
-}
+        const options = { year: "numeric", month: "short", day: "numeric" };
+        return value.toLocaleDateString("sv-SE", options);
+      }
 
       // Check if value is a number
       function isNumber(value) {
