@@ -574,10 +574,9 @@
 
       // Generate a color from the color wheel
       function getColorFromColorWheel(position) {
-        
-        const color = hsl(position, 100, 44);
-        return color;
-      }
+    const color = `hsl(${position}, 100%, 44%)`;
+    return color;
+}
       // Handle drag end
       function handleDragEnd(event) {
         const box = event.target;
