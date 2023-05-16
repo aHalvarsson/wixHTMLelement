@@ -376,7 +376,7 @@
         for (let i = 0; i < colCount; i++) {
           const cell = document.createElement("div");
           cell.classList.add("cell", "column-letter-cell");
-          cell.textContent = String.fromCharCode(startColumn.charCodeAt(0) + i);
+          cell.textContent = String.fromCharCode(65 + i);
           dataGrid.appendChild(cell);
         }
         
