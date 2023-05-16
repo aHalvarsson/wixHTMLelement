@@ -370,10 +370,10 @@
         const columnCount =
           endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
 */
-          const startColumn = XLSX.utils.encode_col(0);
-          const startRow = XLSX.utils.encode_row(0);
-          const endColumn = XLSX.utils.encode_col(excelData[0].length);
-          const endRow = XLSX.utils.encode_row(excelData.length);
+          const startColumn = XLSX.utils.decode_col(0);
+          const startRow = XLSX.utils.decode_row(0);
+          const endColumn = XLSX.utils.decode_col(excelData[0].length);
+          const endRow = XLSX.utils.decode_row(excelData.length);
           //const columnCount =
           endColumn.charCodeAt(0) - startColumn.charCodeAt(0) + 1;
         //const rowCount = endRow - startRow + 1;
@@ -404,7 +404,7 @@
           if(j === -1) {
           const rowNumberCell = document.createElement("div");
           rowNumberCell.classList.add("cell", "row-number-cell");
-          rowNumberCell.textContent = startRow + i;
+          rowNumberCell.textContent = i + 1;
           dataGrid.appendChild(rowNumberCell);
             } else {
 
@@ -546,9 +546,7 @@
         let data = event.dataTransfer.getData("text/plain");
         const dataX = data.slice(0, data.lastIndexOf("X"));
         data = dataX;
-        const sieHeaderBox = document.querySelector(
-          `.sie-header-box:contains("${data}")`
-        );
+        const sieHeaderBox = Array.from(document.querySelectorAll(".sie-header-box")).find(el => el.textContent.includes(data));
         const cell = event.target;
 
         // Disconnect previous link
