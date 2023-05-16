@@ -254,10 +254,7 @@
           await addColumnLettersAndRowNumbers(grid, excelData);
 
           // Add data from excelData array
-          await addData(dataGrid, excelData);
-
-          // Add row toggle switch
-          await createToggleSwitcher(grid);
+          //await addData(dataGrid, excelData);
 
           // Add highlight to the found titles
           await highlightFoundTitles(dataGrid, foundTitles, excelData);
@@ -274,6 +271,9 @@
           // Add save button to grid
           await addSaveButton(grid, file);
 
+          // Add row toggle switch
+          await createToggleSwitcher(foundTitles, excelData, grid);
+
           // Start with the right rows visible
           handleToggleChange(foundTitles, excelData, grid);
 
@@ -282,7 +282,7 @@
       }
 
       // Creates a row toggle switch to every tab
-      function createToggleSwitcher(grid) {
+      function createToggleSwitcher(foundTitles, excelData, grid) {
         const toggleSwitch = document.createElement("input");
         toggleSwitch.setAttribute("type", "checkbox");
         toggleSwitch.classList.add("toggle-switch");
@@ -404,6 +404,8 @@
           for (let j = 0; j < columnCount; j++) {
             const cell = document.createElement("div");
             cell.classList.add("cell", "data-cell");
+            let cellValue = excelData[i][j];
+            cell.textContent = formatCellValue(cellValue);
             dataGrid.appendChild(cell);
           }
         }
@@ -533,7 +535,9 @@
       // Handle drop
       function handleDrop(event) {
         event.preventDefault();
-        const data = event.dataTransfer.getData("text/plain");
+        let data = event.dataTransfer.getData("text/plain");
+        const dataX = data.slice(0, data.lastIndexOf("X"));
+        data = dataX;
         const sieHeaderBox = document.querySelector(
           `.sie-header-box:contains("${data}")`
         );
