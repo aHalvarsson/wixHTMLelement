@@ -232,7 +232,7 @@
             box.textContent = header;
             box.draggable = true;
             box.addEventListener("dragstart", handleDragStart);
-
+console.log(foundTitles);
             // Display SIE header guesses in light gray if no data titles are found
             if (foundTitles.length === 0) {
               box.classList.add("guess");
@@ -253,6 +253,7 @@
           const dataGrid = document.createElement("div");
           dataGrid.classList.add("data-grid");
           dataGrid.style.display = "grid";
+console.log(excelData);
           dataGrid.style.setProperty("--num-cols", excelData[0].length);
           grid.appendChild(dataGrid);
 
@@ -563,7 +564,7 @@
       function setStartLinkConnection(foundHeaders, excelData, grid) {
         const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
         const dataCell = Array.from(dataGrid[0].querySelectorAll(".data-cell"));
-
+console.log(foundHeaders);
         foundHeaders.forEach((header, index) => {
           const cell =
             dataCell[(header.row - 1) * excelData[0].length + header.col];
