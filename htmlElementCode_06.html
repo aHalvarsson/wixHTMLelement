@@ -186,11 +186,11 @@ console.log(excelData);
       };
 
       // Create a tab for each Excel file
-      function createTabs(excelFiles, mainContainer) {
+      function createTabs(fileArray, mainContainer) {
         const tabs = document.createElement("ul");
         tabs.classList.add("tabs");
 
-        excelFiles.forEach((file, index) => {
+        fileArray.forEach((file, index) => {
           const tab = document.createElement("li");
           tab.classList.add("tab");
           tab.textContent = file.name;
@@ -217,14 +217,14 @@ console.log(excelData);
 
       // Create a grid for each Excel file
       function createGrids(
-        excelFiles,
-        foundTitles,
+        fileArray,
+        foundHeaders,
         sieHeaders,
         excelData,
         mainContainer
       ) {
-        excelFiles.forEach(async (file, index) => {
-          foundTitles = foundTitles[index];
+        fileArray.forEach(async (file, index) => {
+          foundHeaders = foundHeaders[index];
           excelData = excelData[index];
           const grid = document.createElement("div");
           grid.classList.add("grid");
@@ -241,9 +241,9 @@ console.log(excelData);
             box.textContent = header;
             box.draggable = true;
             box.addEventListener("dragstart", handleDragStart);
-            console.log(foundTitles);
+  
             // Display SIE header guesses in light gray if no data titles are found
-            if (foundTitles.length === 0) {
+            if (foundHeaders.length === 0) {
               box.classList.add("guess");
             }
 
@@ -281,26 +281,26 @@ console.log(excelData);
           await addSaveButton(grid, file);
 
           // Add row toggle switch
-          await createToggleSwitcher(foundTitles, excelData, grid);
+          await createToggleSwitcher(foundHeaders, excelData, grid);
 
           // Set start link connection with guessed headers and SIE-headers
-          setStartLinkConnection(foundTitles, excelData, grid);
+          setStartLinkConnection(foundHeaders, excelData, grid);
 
           // Start with the right rows visible
-          handleToggleChange(foundTitles, excelData, grid);
+          handleToggleChange(foundHeaders, excelData, grid);
 
           mainContainer.appendChild(grid);
         });
       }
 
       // Creates a row toggle switch to every tab
-      function createToggleSwitcher(foundTitles, excelData, grid) {
+      function createToggleSwitcher(foundHeaders, excelData, grid) {
         const toggleSwitch = document.createElement("input");
         toggleSwitch.setAttribute("type", "checkbox");
         toggleSwitch.classList.add("toggle-switch");
         toggleSwitch.checked = "true";
         toggleSwitch.addEventListener("change", (event) => {
-          handleToggleChange(foundTitles, excelData, grid);
+          handleToggleChange(foundHeaders, excelData, grid);
         });
         const toggleLabel = document.createElement("label");
         toggleLabel.appendChild(toggleSwitch);
@@ -572,8 +572,9 @@ console.log(excelData);
 
       function setStartLinkConnection(foundHeaders, excelData, grid) {
         if (!Array.isArray(foundHeaders)) {
-          console.error("foundHeaders must be an array");
-          return;
+          console.error("foundHeaders must be an array: ");
+          console.log(foundHeaders);
+          
         }
 
         const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
