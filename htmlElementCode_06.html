@@ -15,9 +15,9 @@
       .data-grid {
         display: grid;
         grid-template-columns: 1.2rem repeat(
-          calc(var(--num-cols)),
-          minmax(1.2rem, auto)
-        );
+            calc(var(--num-cols)),
+            minmax(1.2rem, auto)
+          );
         grid-auto-rows: minmax(25px, auto);
         grid-gap: 0;
         border-top: 1px solid black;
@@ -40,12 +40,14 @@
         border-bottom: 1px solid black;
       }
 
-      .column-letter-cell, .corner-cell {
+      .column-letter-cell,
+      .corner-cell {
         height: 1.2rem;
         background-color: #636363;
       }
 
-      .row-number-cell, .corner-cell {
+      .row-number-cell,
+      .corner-cell {
         width: 0.8rem;
         background-color: #636363;
       }
@@ -71,8 +73,6 @@
         border: 1px solid black;
         cursor: move;
       }
-
-    
 
       /* Styling for the Save changes buttons */
       button {
@@ -144,42 +144,41 @@
 
         if (event.data) {
           if (event.data === "getUserData") {
-
           } else {
-            
-          
-          let mainContainer = document.getElementById("main-element-container");
+            let mainContainer = document.getElementById(
+              "main-element-container"
+            );
 
-          const fileArray = event.data[0]; // Array of files
-          const foundHeaders = event.data[1]; // Array of headers for each file
-          const excelData = event.data[2]; // Array of Excel data for each file, everey nested array is a row
-          const sieHeaders = [
-            // Array of SIE headers
-            "Debet",
-            "Kredit",
-            "Belopp",
-            "Konto",
-            "Konstnadsställe",
-            "Projekt",
-            "Radtext",
-            "Radbeskrivning",
-            "Kostnadsbärare",
-            "Debetbelopp",
-            "Kreditbelopp",
-            "Verifikationstext",
-            "Verifikatserie",
-          ];
-          createTabs(fileArray, mainContainer);
-          createGrids(
-            fileArray,
-            foundHeaders,
-            sieHeaders,
-            excelData,
-            mainContainer
-          );
-          loadData();
+            const fileArray = event.data[0]; // Array of files
+            const foundHeaders = event.data[1]; // Array of headers for each file
+            const excelData = event.data[2]; // Array of Excel data for each file, everey nested array is a row
+            const sieHeaders = [
+              // Array of SIE headers
+              "Debet",
+              "Kredit",
+              "Belopp",
+              "Konto",
+              "Konstnadsställe",
+              "Projekt",
+              "Radtext",
+              "Radbeskrivning",
+              "Kostnadsbärare",
+              "Debetbelopp",
+              "Kreditbelopp",
+              "Verifikationstext",
+              "Verifikatserie",
+            ];
+            createTabs(fileArray, mainContainer);
+            createGrids(
+              fileArray,
+              foundHeaders,
+              sieHeaders,
+              excelData,
+              mainContainer
+            );
+            loadData();
+          }
         }
-      }
       };
 
       // Create a tab for each Excel file
@@ -238,7 +237,7 @@
             box.textContent = header;
             box.draggable = true;
             box.addEventListener("dragstart", handleDragStart);
-console.log(foundTitles);
+            console.log(foundTitles);
             // Display SIE header guesses in light gray if no data titles are found
             if (foundTitles.length === 0) {
               box.classList.add("guess");
@@ -259,7 +258,7 @@ console.log(foundTitles);
           const dataGrid = document.createElement("div");
           dataGrid.classList.add("data-grid");
           dataGrid.style.display = "grid";
-console.log("excelData.length: " + excelData[0].length);
+
           dataGrid.style.setProperty("--num-cols", excelData[0].length);
           grid.appendChild(dataGrid);
 
@@ -383,7 +382,7 @@ console.log("excelData.length: " + excelData[0].length);
         for (let i = -1; i < colCount; i++) {
           const cell = document.createElement("div");
           cell.classList.add("cell", "column-letter-cell");
-          if(i > -1) cell.textContent = String.fromCharCode(65 + i);
+          if (i > -1) cell.textContent = String.fromCharCode(65 + i);
           else cell.textContent = "";
           dataGrid.appendChild(cell);
         }
@@ -543,7 +542,7 @@ console.log("excelData.length: " + excelData[0].length);
           "mouseleave",
           sieHeaderBox.unhighlight
         );
-        
+
         unhighlightLinked(cell, sieHeaderBox);
 
         // Delete the stored functions
@@ -568,17 +567,20 @@ console.log("excelData.length: " + excelData[0].length);
       }
 
       function setStartLinkConnection(foundHeaders, excelData, grid) {
+        if (!Array.isArray(foundHeaders)) {
+          console.error("foundHeaders must be an array");
+          return;
+        }
+
         const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
         const dataCell = Array.from(dataGrid[0].querySelectorAll(".data-cell"));
-console.log(foundHeaders);
+        console.log(foundHeaders);
         foundHeaders.forEach((header, index) => {
           const cell =
             dataCell[(header.row - 1) * excelData[0].length + header.col];
-
           const sieHeaderBox = Array.from(
             grid.querySelectorAll(".sie-header-box")
           ).find((el) => el.textContent.includes(header.value));
-
           setLinkConnection(cell, header.value, sieHeaderBox);
         });
       }
