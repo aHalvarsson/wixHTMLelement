@@ -172,15 +172,17 @@ console.log(excelData);
               "Verifikationstext",
               "Verifikatserie",
             ];
+            fileArray.forEach((file, index) => {
             createTabs(fileArray, mainContainer);
             createGrids(
-              fileArray,
-              foundHeaders,
+              fileArray[index],
+              foundHeaders[index],
               sieHeaders,
-              excelData,
+              excelData[index],
               mainContainer
             );
-            loadData();
+           // loadData();
+          });
           }
         }
       };
@@ -216,19 +218,19 @@ console.log(excelData);
       }
 
       // Create a grid for each Excel file
-      function createGrids(
-        fileArray,
+      async function createGrids(
+        file,
         foundHeadersOrig,
         sieHeaders,
         excelData,
         mainContainer
       ) {
-        fileArray.forEach(async (file, index) => {
-          const foundHeaders = foundHeadersOrig[index];
+        
+          const foundHeaders = foundHeadersOrig;
           const headToggleSwitch = foundHeaders;
           const headLinkCon = foundHeaders;
           const headToggleChange = foundHeaders;
-          excelData = excelData[index];
+
           const grid = document.createElement("div");
           grid.classList.add("grid");
           if (index === 0) {
@@ -293,7 +295,7 @@ console.log(excelData);
           handleToggleChange(headToggleChange, excelData, grid);
 
           mainContainer.appendChild(grid);
-        });
+        
       }
 
       // Creates a row toggle switch to every tab
