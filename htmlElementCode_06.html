@@ -574,14 +574,14 @@ console.log(excelData);
       }
 
       function setStartLinkConnection(foundHeaders, excelData, grid) {
-        if (!Array.isArray(foundHeaders)) {
-          console.error("foundHeaders must be an array: ");
-          console.log(foundHeaders);
-          
-        }
+       
+        console.log(foundHeaders);
+        console.log(excelData);
 
         const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
         const dataCell = Array.from(dataGrid[0].querySelectorAll(".data-cell"));
+        console.log(dataGrid);
+        console.log(dataCell);
         
         foundHeaders.forEach((header, index) => {
           const cell =
