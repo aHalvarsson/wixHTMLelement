@@ -143,6 +143,11 @@
         // recive data from uotside the HTML element
 
         if (event.data) {
+          if (event.data === "getUserData") {
+
+          } else {
+            
+          
           let mainContainer = document.getElementById("main-element-container");
 
           const fileArray = event.data[0]; // Array of files
@@ -174,6 +179,7 @@
           );
           loadData();
         }
+      }
       };
 
       // Create a tab for each Excel file
@@ -253,7 +259,7 @@ console.log(foundTitles);
           const dataGrid = document.createElement("div");
           dataGrid.classList.add("data-grid");
           dataGrid.style.display = "grid";
-console.log(excelData);
+console.log("excelData.length: " + excelData[0].length);
           dataGrid.style.setProperty("--num-cols", excelData[0].length);
           grid.appendChild(dataGrid);
 
