@@ -618,7 +618,8 @@
           `.${grandparentClass}`
         ));
         const grandparent = getAncestorByClass(grandchild, grandparentClass);
-
+        console.log(grandparent);
+        console.log(grandparentNodes);
         const grandparentIndex = grandparentNodes.indexOf(grandparent);
         return grandparentIndex;
       }
@@ -647,6 +648,7 @@
         // Connect new link
         cell.setAttribute("data-sie-header", data);
         cell.classList.add("linked-cell");
+        console.log(cell);
         let gridIndex = getGrandparentIndex(cell);
         console.log(gridIndex);
         console.log(colorWheelPosition[gridIndex]);
