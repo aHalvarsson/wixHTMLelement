@@ -689,7 +689,7 @@
         const borderColor = `hsl(${position * 30}, 100%, 44%)`;
         const bgColor = `hsl(${position * 30}, 100%, 90%)`;
         // Increment color wheel position
-        colorWheelPosition[gridIndex]++;
+        colorWheelPosition[gridIndex] +=1;
         return [borderColor, bgColor];
       }
       // Handle drag end
