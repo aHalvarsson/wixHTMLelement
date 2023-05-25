@@ -147,6 +147,9 @@
   <body>
     <div id="main-element-container"></div>
     <script>
+      // Variable to keep track of current position in color wheel
+      let colorWheelPosition = [];
+
       window.onmessage = (event) => {
         // recive data from uotside the HTML element
 
@@ -161,6 +164,9 @@
             const foundHeaders = event.data[1]; // Array of headers for each file
             const excelData = event.data[2]; // Array of Excel data for each file, everey nested array is a row
 
+            fileArray.forEach((file, index) => {
+              colorWheelPosition[index] = 0;
+            });
 
             const sieHeaders = [
               // Array of SIE headers
@@ -309,14 +315,14 @@
           await setStartLinkConnection(headLinkCon, excelData, dataGrid, grid);
 
           // Start with the right rows visible
-          handleToggleChange(headToggleChange, excelData, dataGrid);
+          await handleToggleChange(headToggleChange, excelData, grid);
 
           mainContainer.appendChild(grid);
         
       }
 
       // Creates a row toggle switch to every tab
-      function createToggleSwitcher(foundHeaders, excelData, grid) {
+      async function createToggleSwitcher(foundHeaders, excelData, grid) {
         const toggleSwitch = document.createElement("input");
         toggleSwitch.setAttribute("type", "checkbox");
         toggleSwitch.classList.add("toggle-switch");
@@ -438,7 +444,7 @@
 
       // Make all data cells editable
       function makeCellsEditable(dataGrid) {
-        const dataCells = dataGrid.querySelectorAll(".data-cell");
+        const dataCells = Array.from(dataGrid.querySelectorAll(".data-cell"));
 
         dataCells.forEach((cell) => {
           cell.addEventListener("click", handleCellClick);
@@ -504,8 +510,8 @@
 
       // Enable drag and drop functionality
       function enableDragAndDrop(grid) {
-        const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
-        const dataCells = Array.from(dataGrid[0].querySelectorAll(".data-cell"));
+        const dataGrid = grid.querySelector(".data-grid");
+        const dataCells = Array.from(dataGrid.querySelectorAll(".data-cell"));
         const sieHeaderBoxes = Array.from(grid.querySelectorAll(".sie-header-box"));
 
         // Allow data cells to be drop targets
@@ -524,9 +530,6 @@
       function handleDragOver(event) {
         event.preventDefault();
       }
-
-      // Variable to keep track of current position in color wheel
-      let colorWheelPosition = 0;
 
       // Handle drop
       function handleDrop(event) {
@@ -593,16 +596,33 @@
         el1.style.boxShadow = "";
         el2.style.boxShadow = "";
       }
+    
+      function getAncestorByClass(element, className) {
+  let ancestor = element.parentNode;
+  while (ancestor) {
+    if (ancestor.classList.contains(className)) {
+      return ancestor;
+    }
+    ancestor = ancestor.parentNode;
+  }
+  return null;
+}
+
+
+      function getGrandparentIndex(grandchild) {
+  const grandparentClass = "grid";
+  const grandparentNodes = document.querySelectorAll(`.${grandparentClass}`);
+const grandparent = getAncestorByClass(grandchild, grandparentClass);
+
+  const grandparentIndex = Array.from(grandparentNodes).indexOf(grandparent);
+  return grandparentIndex;
+}
+
 
       async function setStartLinkConnection(foundHeaders, excelData, dataGrid, grid) {
        
-        console.log(foundHeaders);
-        console.log(excelData);
-
         //const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
         const dataCell = Array.from(dataGrid.querySelectorAll(".data-cell"));
-        console.log(dataGrid);
-        console.log(dataCell);
         
         await foundHeaders.forEach((header, index) => {
           const cell =
@@ -619,9 +639,9 @@
         // Connect new link
         cell.setAttribute("data-sie-header", data);
         cell.classList.add("linked-cell");
-
+        let gridIndex = getGrandparentIndex(cell);
         // Generate the next color in the color wheel
-        const colors = getColorFromColorWheel(colorWheelPosition);
+        const colors = getColorFromColorWheel(colorWheelPosition[gridIndex], gridIndex);
         const borderColor = colors[0];
         const bgColor = colors[1];
         cell.setAttribute("data-connection-color", borderColor);
@@ -653,11 +673,11 @@
       }
 
       // Generate a color from the color wheel
-      function getColorFromColorWheel(position) {
+      function getColorFromColorWheel(position, gridIndex) {
         const borderColor = `hsl(${position * 30}, 100%, 44%)`;
         const bgColor = `hsl(${position * 30}, 100%, 90%)`;
         // Increment color wheel position
-        colorWheelPosition++;
+        colorWheelPosition[gridIndex]++;
         return [borderColor, bgColor];
       }
       // Handle drag end
