@@ -148,14 +148,14 @@
     <script>
       // Variable to keep track of current position in color wheel
       let colorWheelPosition = [];
-
+      let mainContainer;
       window.onmessage = (event) => {
         // recive data from uotside the HTML element
 
         if (event.data) {
           if (event.data === "getUserData") {
           } else {
-            let mainContainer = document.getElementById(
+            mainContainer = document.getElementById(
               "main-element-container"
             );
 
@@ -614,10 +614,11 @@
 
       function getGrandparentIndex(grandchild) {
         const grandparentClass = "grid";
-        const grandparentNodes = Array.from(document.querySelectorAll(".grid"));
+        const grandparentNodes = Array.from(mainContainer.querySelectorAll(".grid"));
+        console.log(grandparentNodes);
         const grandparent = getAncestorByClass(grandchild, grandparentClass);
         console.log(grandparent);
-        console.log(grandparentNodes)
+        
         const grandparentIndex = grandparentNodes.indexOf(grandparent);
         return grandparentIndex;
       }
