@@ -227,11 +227,19 @@
       function handleTabClick(event) {
         const index = event.target.dataset.index;
         const grids = document.querySelectorAll(".grid");
+        const tabs = document.querySelectorAll(".tab");
         grids.forEach((grid, i) => {
           if (i === parseInt(index)) {
             grid.classList.add("active");
           } else {
             grid.classList.remove("active");
+          }
+        });
+        tabs.forEach((tab, i) => {
+          if (i === parseInt(index)) {
+            tab.classList.add("active");
+          } else {
+            tab.classList.remove("active");
           }
         });
       }
@@ -301,7 +309,7 @@
         await addDisconnectButtons(dataGrid);
 
         // Add save button to grid
-        await addSaveButton(dataGrid, file);
+        await addSaveButton(grid, file);
 
         // Add row toggle switch
         await createToggleSwitcher(headToggleSwitch, excelData, grid);
@@ -533,7 +541,7 @@
         let data = event.dataTransfer.getData("text/plain");
         const dataX = data.slice(0, data.lastIndexOf("X"));
         data = dataX;
-        const activeGrid = Array.from(document.querySelector(".active-grid"));
+        const activeGrid = document.querySelector(".grid .active");
         const sieHeaderBox = Array.from(
           activeGrid.querySelectorAll(".sie-header-box")
         ).find((el) => el.textContent.includes(data));
