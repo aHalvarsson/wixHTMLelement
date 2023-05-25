@@ -32,6 +32,14 @@
         display: grid;
       }
 
+      .grid {
+        display: none;
+      }
+
+      .grid .active {
+        display: block;
+      }
+
       .cell {
         padding: 3px;
         text-align: right;
@@ -152,9 +160,7 @@
             const fileArray = event.data[0]; // Array of files
             const foundHeaders = event.data[1]; // Array of headers for each file
             const excelData = event.data[2]; // Array of Excel data for each file, everey nested array is a row
-console.log(fileArray);
-console.log(foundHeaders);
-console.log(excelData);
+
 
             const sieHeaders = [
               // Array of SIE headers
@@ -172,8 +178,9 @@ console.log(excelData);
               "Verifikationstext",
               "Verifikatserie",
             ];
-            fileArray.forEach((file, index) => {
             createTabs(fileArray, mainContainer);
+            fileArray.forEach((file, index) => {
+            
             createGrids(
               fileArray[index],
               foundHeaders[index],
@@ -183,6 +190,11 @@ console.log(excelData);
               index
             );
            // loadData();
+
+           // TODO: Make a function to hide all grids that does not have the class active when page loads.
+           // TODO: Style the tab for the active grid.
+           // TODO: Linking between SIE-headers and cells mixes between grids and must be fixed.
+
           });
           }
         }
@@ -198,6 +210,9 @@ console.log(excelData);
           tab.classList.add("tab");
           tab.textContent = file.name;
           tab.dataset.index = index;
+          if (index === 0) {
+            tab.classList.add("active");
+          }
           tab.addEventListener("click", handleTabClick);
           tabs.appendChild(tab);
         });
@@ -221,14 +236,14 @@ console.log(excelData);
       // Create a grid for each Excel file
       async function createGrids(
         file,
-        foundHeadersOrig,
+        foundHeaders,
         sieHeaders,
         excelData,
         mainContainer,
         index
       ) {
         
-          const foundHeaders = foundHeadersOrig;
+          const foundHeaders = foundHeaders;
           const headToggleSwitch = foundHeaders;
           const headLinkCon = foundHeaders;
           const headToggleChange = foundHeaders;
@@ -274,27 +289,27 @@ console.log(excelData);
           grid.appendChild(dataGrid);
 
           // Add column letters and row numbers
-          await addColumnLettersAndRowNumbers(grid, excelData);
+          await addColumnLettersAndRowNumbers(dataGrid, excelData);
 
-          await makeCellsEditable(grid);
+          await makeCellsEditable(dataGrid);
 
           // Enable drag and drop functionality
           await enableDragAndDrop(grid);
 
           // Add disconnect buttons to SIE header boxes
-          await addDisconnectButtons(grid);
+          await addDisconnectButtons(dataGrid);
 
           // Add save button to grid
-          await addSaveButton(grid, file);
+          await addSaveButton(dataGrid, file);
 
           // Add row toggle switch
           await createToggleSwitcher(headToggleSwitch, excelData, grid);
 
           // Set start link connection with guessed headers and SIE-headers
-          await setStartLinkConnection(headLinkCon, excelData, grid);
+          await setStartLinkConnection(headLinkCon, excelData, dataGrid);
 
           // Start with the right rows visible
-          handleToggleChange(headToggleChange, excelData, grid);
+          handleToggleChange(headToggleChange, excelData, dataGrid);
 
           mainContainer.appendChild(grid);
         
@@ -377,8 +392,8 @@ console.log(excelData);
       }
 
       // Add column letters and row numbers to data grid
-      function addColumnLettersAndRowNumbers(grid, excelData) {
-        const dataGrid = grid.querySelector(".data-grid");
+      function addColumnLettersAndRowNumbers(dataGrid, excelData) {
+        //const dataGrid = grid.querySelector(".data-grid");
 
         //const rowCount = endRow - startRow + 1;
         const colCount = excelData[0].length;
@@ -422,8 +437,8 @@ console.log(excelData);
       }
 
       // Make all data cells editable
-      function makeCellsEditable(grid) {
-        const dataCells = grid.querySelectorAll(".data-cell");
+      function makeCellsEditable(dataGrid) {
+        const dataCells = dataGrid.querySelectorAll(".data-cell");
 
         dataCells.forEach((cell) => {
           cell.addEventListener("click", handleCellClick);
@@ -489,8 +504,9 @@ console.log(excelData);
 
       // Enable drag and drop functionality
       function enableDragAndDrop(grid) {
-        const dataCells = grid.querySelectorAll(".data-cell");
-        const sieHeaderBoxes = grid.querySelectorAll(".sie-header-box");
+        const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
+        const dataCells = Array.from(dataGrid.querySelectorAll(".data-cell"));
+        const sieHeaderBoxes = Array.from(grid.querySelectorAll(".sie-header-box"));
 
         // Allow data cells to be drop targets
         dataCells.forEach((cell) => {
@@ -518,13 +534,14 @@ console.log(excelData);
         let data = event.dataTransfer.getData("text/plain");
         const dataX = data.slice(0, data.lastIndexOf("X"));
         data = dataX;
+        const activeGrid = Array.from(document.querySelector(".active-grid"));
         const sieHeaderBox = Array.from(
-          document.querySelectorAll(".sie-header-box")
+          activeGrid.querySelectorAll(".sie-header-box")
         ).find((el) => el.textContent.includes(data));
         const cell = event.target;
 
         // Disconnect previous link
-        const previousLink = document.querySelector(
+        const previousLink = activeGrid.querySelector(
           `[data-sie-header="${data}"]`
         );
         if (previousLink) {
@@ -577,13 +594,13 @@ console.log(excelData);
         el2.style.boxShadow = "";
       }
 
-      async function setStartLinkConnection(foundHeaders, excelData, grid) {
+      async function setStartLinkConnection(foundHeaders, excelData, dataGrid) {
        
         console.log(foundHeaders);
         console.log(excelData);
 
-        const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
-        const dataCell = Array.from(dataGrid[0].querySelectorAll(".data-cell"));
+        //const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
+        const dataCell = Array.from(dataGrid.querySelectorAll(".data-cell"));
         console.log(dataGrid);
         console.log(dataCell);
         
