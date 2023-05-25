@@ -635,7 +635,7 @@
         await foundHeaders.forEach((header, index) => {
           const cell =
             dataCell[(header.row - 1) * excelData[0].length + header.col];
-          console.log(cell);
+          
           const sieHeaderBox = Array.from(
             grid.querySelectorAll(".sie-header-box")
           ).find((el) => el.textContent.includes(header.value));
@@ -648,6 +648,8 @@
         cell.setAttribute("data-sie-header", data);
         cell.classList.add("linked-cell");
         let gridIndex = getGrandparentIndex(cell);
+        console.log(gridIndex);
+        console.log(colorWheelPosition[gridIndex]);
         // Generate the next color in the color wheel
         const colors = getColorFromColorWheel(
           colorWheelPosition[gridIndex],
@@ -685,6 +687,8 @@
 
       // Generate a color from the color wheel
       function getColorFromColorWheel(position, gridIndex) {
+        console.log(gridIndex);
+        console.log(position);
         const borderColor = `hsl(${position * 30}, 100%, 44%)`;
         const bgColor = `hsl(${position * 30}, 100%, 90%)`;
         // Increment color wheel position
