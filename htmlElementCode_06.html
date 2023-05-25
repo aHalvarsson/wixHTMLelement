@@ -306,7 +306,7 @@
           await createToggleSwitcher(headToggleSwitch, excelData, grid);
 
           // Set start link connection with guessed headers and SIE-headers
-          await setStartLinkConnection(headLinkCon, excelData, dataGrid);
+          await setStartLinkConnection(headLinkCon, excelData, dataGrid, grid);
 
           // Start with the right rows visible
           handleToggleChange(headToggleChange, excelData, dataGrid);
@@ -594,7 +594,7 @@
         el2.style.boxShadow = "";
       }
 
-      async function setStartLinkConnection(foundHeaders, excelData, dataGrid) {
+      async function setStartLinkConnection(foundHeaders, excelData, dataGrid, grid) {
        
         console.log(foundHeaders);
         console.log(excelData);
@@ -609,7 +609,7 @@
             dataCell[(header.row - 1) * excelData[0].length + header.col];
             console.log(cell);
           const sieHeaderBox = Array.from(
-            dataGrid.querySelectorAll(".sie-header-box")
+            grid.querySelectorAll(".sie-header-box")
           ).find((el) => el.textContent.includes(header.value));
           setLinkConnection(cell, header.value, sieHeaderBox);
         });
