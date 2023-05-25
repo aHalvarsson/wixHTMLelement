@@ -613,14 +613,13 @@
       }
 
       function getGrandparentIndex(grandchild) {
-        const grandparentClass = "grid";
-        const grandparentNodes = document.querySelectorAll(
+        const grandparentClass = ".grid";
+        const grandparentNodes = Array.from(document.querySelectorAll(
           `.${grandparentClass}`
-        );
+        ));
         const grandparent = getAncestorByClass(grandchild, grandparentClass);
 
-        const grandparentIndex =
-          Array.from(grandparentNodes).indexOf(grandparent);
+        const grandparentIndex = grandparentNodes.indexOf(grandparent);
         return grandparentIndex;
       }
 
