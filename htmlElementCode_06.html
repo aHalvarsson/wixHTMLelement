@@ -505,7 +505,7 @@
       // Enable drag and drop functionality
       function enableDragAndDrop(grid) {
         const dataGrid = Array.from(grid.querySelectorAll(".data-grid"));
-        const dataCells = Array.from(dataGrid.querySelectorAll(".data-cell"));
+        const dataCells = Array.from(dataGrid[0].querySelectorAll(".data-cell"));
         const sieHeaderBoxes = Array.from(grid.querySelectorAll(".sie-header-box"));
 
         // Allow data cells to be drop targets
