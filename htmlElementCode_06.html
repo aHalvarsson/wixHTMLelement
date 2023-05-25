@@ -609,7 +609,7 @@
             dataCell[(header.row - 1) * excelData[0].length + header.col];
             console.log(cell);
           const sieHeaderBox = Array.from(
-            grid.querySelectorAll(".sie-header-box")
+            dataGrid.querySelectorAll(".sie-header-box")
           ).find((el) => el.textContent.includes(header.value));
           setLinkConnection(cell, header.value, sieHeaderBox);
         });
