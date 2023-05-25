@@ -541,7 +541,7 @@
         let data = event.dataTransfer.getData("text/plain");
         const dataX = data.slice(0, data.lastIndexOf("X"));
         data = dataX;
-        const activeGrid = document.querySelector(".grid .active");
+        const activeGrid = document.querySelector(".grid.active");
         const sieHeaderBox = Array.from(
           activeGrid.querySelectorAll(".sie-header-box")
         ).find((el) => el.textContent.includes(data));
